@@ -1,7 +1,6 @@
 
-		var canvas = document.getElementById("canvas");
+		//var canvas = document.getElementById("canvas");
 
-console.log("see")
 		const WALL_MAX_X = 600
 		const WALL_MAX_Y = 600
 
@@ -35,9 +34,13 @@ function distanceToWall (x_or_y, vx_or_vy, max_x_or_y) {
    }
 }
 
-	function distancetoBall (x_or_y, vx_or_vy, max_x_or_y) {
-		switch (getM)
-	}
+
+// TESTS
+console.log(distanceToWall(10, 10, 600))
+	//
+	// function distancetoBall (x_or_y, vx_or_vy, max_x_or_y) {
+	// 	switch (getM)
+	// }
 
 /* test balls
 b1 = makeBall(1,2,3,4,5) // hit right wall
@@ -87,7 +90,8 @@ function moveBall(ball) {
 			*/
 		}
 
-		var interval = setInterval(draw, 0);
+	//	var interval = setInterval(draw, 0);
 
 		function reset() {
 			ctx.clearRect(0,0, canvas.width, canvas.height);
+}
