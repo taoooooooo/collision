@@ -1,29 +1,7 @@
-// Screen resolution
-// Origin (0, 0) is the top left corner
-// capitalised is constant
-
-<html>
-
-<head>
-	<title>Template</title>
-	<style>
-		html {
-			background-color: #DDFFDD;
-		}
-		#canvas {
-
-			border: solid #000000 4px;
-		}
-
-	</style>
-</head>
-
-<body>
-	<canvas id="canvas" width="600" height="600">box</canvas>
-	<script>
 
 		var canvas = document.getElementById("canvas");
 
+console.log("see")
 		const WALL_MAX_X = 600
 		const WALL_MAX_Y = 600
 
@@ -79,6 +57,7 @@ function timeToHitWall(x_or_y, vx_or_vy, max_x_or_y) {
 
 function timeToHitVerticalWall(ball) {
   return timeToHitWall(ball.x, ball.vX, WALL_MAX_X)
+}
 
 
 function timeToHitHorizontalWall(ball) {
@@ -112,9 +91,3 @@ function moveBall(ball) {
 
 		function reset() {
 			ctx.clearRect(0,0, canvas.width, canvas.height);
-
-
-</script>
-<button type="button" onclick="reset()">reset</button>
-<button type="button" onclick="makeBall()">Add Ball</button>
-</html>
