@@ -109,6 +109,10 @@ function timeToHitHorizontalWall(ball) {
   return timeToHitWall(ball.y, ball.vY, WALL_MAX_Y)
 }
 
+function timeToHitBall(ball1,ball2) {
+	return
+}
+
 function moveBall(ball) {
 
 			drawBall();
@@ -137,8 +141,3 @@ function moveBall(ball) {
 		function reset() {
 			ctx.clearRect(0,0, canvas.width, canvas.height);
 }
-
-	function dispTime() {
-		//distance divided by velocity
-		distanceBalls / ball.vx, ball.vy
-	}
