@@ -68,13 +68,13 @@ console.log(findCommonPoint(1, 2, 1/2, 4))
 // intercept2 = ball2.y - gradient2 * ball2.x
 
 
-//
-// function distancebetweenBalls (ball1, ball2) {
-// 	// x: posX, y: posY, radius: radius, vX: velocityX, vY: velocityY, m: mass
-// 	//sqrt((x1-x2)^2 + (y1-y2)^2 - (r1 + r2)
-// 	distanceDots = Math.sprt(Math.pow(ball1.x - ball2.x, 2) + Math.pow(ball1.y - ball2.y, 2))
-// 	distanceBalls = distanceDots - (ball1.r + ball2.r)
-// }
+
+ function distancebetweenBalls (ball1, ball2) {
+ 		x: posX, y: posY, radius: radius, vX: velocityX, vY: velocityY, m: mass
+ 		sqrt((x1-x2)^2 + (y1-y2)^2 - (r1 + r2)
+ 		distanceDots = Math.sprt(Math.pow(ball1.x - ball2.x, 2) + Math.pow(ball1.y - ball2.y, 2))
+ 		distanceBalls = distanceDots - (ball1.r + ball2.r)
+ 	}
 
 
 
@@ -137,3 +137,8 @@ function moveBall(ball) {
 		function reset() {
 			ctx.clearRect(0,0, canvas.width, canvas.height);
 }
+
+	function dispTime() {
+		//distance divided by velocity
+		distanceBalls / ball.vx, ball.vy
+	}
