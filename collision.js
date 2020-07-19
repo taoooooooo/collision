@@ -70,8 +70,8 @@ console.log(findCommonPoint(1, 2, 1/2, 4))
 
 
  function distancebetweenBalls (ball1, ball2) {
- 		x: posX, y: posY, radius: radius, vX: velocityX, vY: velocityY, m: mass
- 		sqrt((x1-x2)^2 + (y1-y2)^2 - (r1 + r2)
+// 		x: posX, y: posY, radius: radius, vX: velocityX, vY: velocityY, m: mass
+// 		sqrt((x1-x2)^2 + (y1-y2)^2 - (r1 + r2)
  		distanceDots = Math.sprt(Math.pow(ball1.x - ball2.x, 2) + Math.pow(ball1.y - ball2.y, 2))
  		distanceBalls = distanceDots - (ball1.r + ball2.r)
  	}
@@ -109,7 +109,9 @@ function timeToHitHorizontalWall(ball) {
   return timeToHitWall(ball.y, ball.vY, WALL_MAX_Y)
 }
 
-function timeToHitBall(ball1,ball2) {
+function timeToCollide(ball1,ball2) {
+	currentDistance = distanceBetweenBalls(ball1, ball2)
+	veloci
 	return
 }
 
