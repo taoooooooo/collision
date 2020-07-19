@@ -77,7 +77,6 @@ console.log(findCommonPoint(1, 2, 1/2, 4))
  	}
 
 
-
 // TESTS
 console.log(distanceToWall(10, 10, 600))
 
@@ -112,12 +111,12 @@ function timeToCollide(ball1,ball2) {
 	currentDistance = distanceBetweenBalls(ball1, ball2)
 // make x and y values separate
 // 		x: posX, y: posY, radius: radius, vX: velocityX, vY: velocityY, m: mass
-	nextX(t) = (ball1.x + ball1.vX*t)
-	nextX2(t) = (ball2.x + ball2.vX*t)
-	nextY(t) = (ball1.y + ball1.vY*t)
-	nextY2(t) = (ball2.y + ball2.vY*t)
-	newDistance(t) = Math.sqrt((nextX(t)-nextX2(t))^2) + ((nextY(t)-nextY2(t))^2)
-	return
+// nextX(t) = (ball1.x + ball1.vX*t)
+// nextX2(t) = (ball2.x + ball2.vX*t)
+// nextY(t) = (ball1.y + ball1.vY*t)
+// nextY2(t) = (ball2.y + ball2.vY*t)
+// newDistance(t) = Math.sqrt((nextX(t)-nextX2(t))^2) + ((nextY(t)-nextY2(t))^2)
+	return -((ball1.x - ball2.x + ball1.y - ball2.y)/(ball1.vX - ball2.vX + ball1.vY - ball2.vY))
 }
 
 function moveBall(ball) {
