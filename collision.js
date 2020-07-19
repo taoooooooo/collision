@@ -119,6 +119,11 @@ function timeToCollide(ball1,ball2) {
 	return -((ball1.x - ball2.x + ball1.y - ball2.y)/(ball1.vX - ball2.vX + ball1.vY - ball2.vY))
 }
 
+b1 = makeBall(1,2,3,4,5) // hit right wall
+b2 = makeBall(4,2,-3,4,5) // hit left wall
+
+console.log("time:" + timeToCollide(b1,b2))
+
 function moveBall(ball) {
 
 			drawBall();
