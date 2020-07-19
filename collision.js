@@ -104,14 +104,19 @@ function timeToHitVerticalWall(ball) {
   return timeToHitWall(ball.x, ball.vX, WALL_MAX_X)
 }
 
-
 function timeToHitHorizontalWall(ball) {
   return timeToHitWall(ball.y, ball.vY, WALL_MAX_Y)
 }
 
 function timeToCollide(ball1,ball2) {
 	currentDistance = distanceBetweenBalls(ball1, ball2)
-	veloci
+// make x and y values separate
+// 		x: posX, y: posY, radius: radius, vX: velocityX, vY: velocityY, m: mass
+	nextX(t) = (ball1.x + ball1.vX*t)
+	nextX2(t) = (ball2.x + ball2.vX*t)
+	nextY(t) = (ball1.y + ball1.vY*t)
+	nextY2(t) = (ball2.y + ball2.vY*t)
+	newDistance(t) = Math.sqrt((nextX(t)-nextX2(t))^2) + ((nextY(t)-nextY2(t))^2)
 	return
 }
 
