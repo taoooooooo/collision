@@ -117,7 +117,7 @@ function timeToCollide(ball1,ball2) {
 // nextY2(t) = (ball2.y + ball2.vY*t)
 // newDistance(t) = Math.sqrt((nextX(t)-nextX2(t))^2) + ((nextY(t)-nextY2(t))^2)
 //console.log(">>>" + ball1.vX  + ":" + ball2.vX + ":" + ball1.vY + ":" + ball2.vY)
-	return -(ball1.x - ball2.x + ball1.y - ball2.y)/((ball1.vX - ball2.vX) + ball1.vY - ball2.vY)
+	return -(ball1.x - ball2.x + ball1.y - ball2.y -2*ball1.r + 2*ball2.r)/((ball1.vX - ball2.vX) + ball1.vY - ball2.vY)
 }
 //
 // b1 = makeBall(1,2, 6,3,4,5) // hit right wall
