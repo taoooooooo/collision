@@ -69,16 +69,16 @@ console.log(findCommonPoint(1, 2, 1/2, 4))
 
 
 
- function distancebetweenBalls (ball1, ball2) {
-// 		x: posX, y: posY, radius: radius, vX: velocityX, vY: velocityY, m: mass
-// 		sqrt((x1-x2)^2 + (y1-y2)^2 - (r1 + r2)
- 		distanceDots = Math.sprt(Math.pow(ball1.x - ball2.x, 2) + Math.pow(ball1.y - ball2.y, 2))
- 		distanceBalls = distanceDots - (ball1.r + ball2.r)
- 	}
-
-
-// TESTS
-console.log(distanceToWall(10, 10, 600))
+//  function distancebetweenBalls (ball1, ball2) {
+// // 		x: posX, y: posY, radius: radius, vX: velocityX, vY: velocityY, m: mass
+// // 		sqrt((x1-x2)^2 + (y1-y2)^2 - (r1 + r2)
+//  		distanceDots = Math.sprt(Math.pow(ball1.x - ball2.x, 2) + Math.pow(ball1.y - ball2.y, 2))
+//  		distanceBalls = distanceDots - (ball1.r + ball2.r)
+//  	}
+//
+//
+// // TESTS
+// console.log(distanceToWall(10, 10, 600))
 
 
 /* test balls
@@ -108,7 +108,7 @@ function timeToHitHorizontalWall(ball) {
 }
 
 function timeToCollide(ball1,ball2) {
-	currentDistance = distanceBetweenBalls(ball1, ball2)
+//	currentDistance = distanceBetweenBalls(ball1, ball2)
 // make x and y values separate
 // 		x: posX, y: posY, radius: radius, vX: velocityX, vY: velocityY, m: mass
 // nextX(t) = (ball1.x + ball1.vX*t)
@@ -116,13 +116,14 @@ function timeToCollide(ball1,ball2) {
 // nextY(t) = (ball1.y + ball1.vY*t)
 // nextY2(t) = (ball2.y + ball2.vY*t)
 // newDistance(t) = Math.sqrt((nextX(t)-nextX2(t))^2) + ((nextY(t)-nextY2(t))^2)
-	return -((ball1.x - ball2.x + ball1.y - ball2.y)/(ball1.vX - ball2.vX + ball1.vY - ball2.vY))
+//console.log(">>>" + ball1.vX  + ":" + ball2.vX + ":" + ball1.vY + ":" + ball2.vY)
+	return -(ball1.x - ball2.x + ball1.y - ball2.y)/((ball1.vX - ball2.vX) + ball1.vY - ball2.vY)
 }
-
-b1 = makeBall(1,2,3,4,5) // hit right wall
-b2 = makeBall(4,2,-3,4,5) // hit left wall
-
-console.log("time:" + timeToCollide(b1,b2))
+//
+// b1 = makeBall(1,2, 6,3,4,5) // hit right wall
+// b2 = makeBall(8,2, 6, -3,4,5) // hit left wall
+//
+// console.log("time:" + timeToCollide(b1,b2))
 
 function moveBall(ball) {
 
