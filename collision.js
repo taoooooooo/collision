@@ -1,15 +1,15 @@
 
-		//var canvas = document.getElementById("canvas");
+//var canvas = document.getElementById("canvas");
 
-		const WALL_MAX_X = 600
-		const WALL_MAX_Y = 600
+const WALL_MAX_X = 600
+const WALL_MAX_Y = 600
 
-		const INFINITY = Number.MAX_VALUE
-		const TIME_UNIT = 1 // 1 second
+const INFINITY = Number.MAX_VALUE
+const TIME_UNIT = 1 // 1 second
 
-		function makeBall (posX, posY, radius, velocityX, velocityY, mass) {
-			return { x: posX, y: posY, radius: radius, vX: velocityX, vY: velocityY, m: mass }
-		}
+function makeBall (posX, posY, radius, velocityX, velocityY, mass) {
+	return { x: posX, y: posY, radius: radius, vX: velocityX, vY: velocityY, m: mass }
+}
 
 function getMovingDirection(v) {
   if (v == 0) {
@@ -41,40 +41,6 @@ function distanceToWall (x_or_y, vx_or_vy, max_x_or_y) {
 // 2. check if they cross (i.e., not parallel)
 // 3. compute time of when they cross
 // 4. if the time is between t0 <= cross-time <= t1(= t0 + 1/30 sec), then it means collision.
-function findGradientIntercept(ball) {
-	gradient = ball.vY/ball.vX // y = ax + b (a is known)
-	intercept = ball.y - gradient * ball.x
-  return [gradient, intercept]
-}
-
-function findCommonPoint(gradient1, intercept1, gradient2, intercept2) {
-	// 0 = (g1 - g2) x + (i1 -i2)
-	// (g1 -g2) x = -(i1 - i2)
-	// x = -(i1 - i2) / (g1 - g2)
-	x = -(intercept1 - intercept2) / (gradient1 - gradient2)
-	// console.log((intercept1 - intercept2),  (gradient1 - gradient2))
-	y = gradient1 * x + intercept1 // y = ax + b
-	return [x, y]
-}
-
-// console.log(findCommonPoint(1, 2, 1/2, 4))
-//
-// gradient1 = ball1.vy/ball1.vx // y = ax + b (a is known)
-// ball1.y = gradient1 * ball1.x + b
-// intercept1 = ball1.y - gradient1 * ball1.x
-//
-// gradient2 = ball2.vy/ball2.vx // y = ax + b (a is known)
-// ball2.y = gradient2 * ball2.x + b
-// intercept2 = ball2.y - gradient2 * ball2.x
-
-
-
-// function distancebetweenBalls (ball1, ball2) {
-// 	//	x: posX, y: posY, radius: radius, vX: velocityX, vY: velocityY, m: mass
-//   		distanceDots = Math.sqrt(Math.pow((ball1.x + ball1.y + (ball1.vX + ball1.vY)*t), 2) + Math.sprt(Math.pow((ball2.x + ball2.y + (ball2.vX + ball2.vY)*t), 2)
-//   		distanceBalls = distanceDots - (ball1.r + ball2.r)
-//   	}
-
 
 // // TESTS
 // console.log(distanceToWall(10, 10, 600))
