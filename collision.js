@@ -106,52 +106,38 @@ function timeToHitHorizontalWall(ball) {
   return timeToHitWall(ball.y, ball.vY, WALL_MAX_Y)
 }
 
-function timeToCollide(ball1,ball2) {
-	// return the time, which will happen in near future.
-	// If there are more than two future times, return near future time only
-	// If there is no future time (meaning all happened already in the past)
-	// return INFINITY
-
-  // (a + b)^2
-	a = ball1.x - ball2.x
-	b = ball1.vX - ball2.vX
-	// (c + d)^2
-	c = ball1.y - ball2.y
-	d = ball1.vY - ball2.vY
-
-	constant = Math.pow(a, 2) + Math.pow(c, 2)
-	coef1 = 2*a*b + 2*c*d // the t's coefficient
-	coef2 = Math.pow(b ,2) + Math.pow(d, 2) // t squared coefficient
-
-  commmonTerm = Math.sqrt(Math.pow(coef1, 2) - 4 * coef2 * constant)
-	time1 = (- coef1 + commmonTerm) / (2 * coef2)
-	time2 = (- coef1 - commmonTerm) / (2 * coef2)
-//	time1 = (-coef1 + Math.sqrt(Math.pow(coef1, 2) - 4*coef2*constant))/2*coef2
-//	time2 = (-coef1 - Math.sqrt(Math.pow(coef1, 2) - 4*coef2*constant))/2*coef2
-
-	if (time1 > 0 && time2 > 0) {
-		return min(time1, time2)
-	} else if (time1 > 0 && time2 < 0) {
-			return time1
-	} else if (time1 < 0 && time2 > 0) {
-			return time2
-	} else if (time1 == 0 || time2 == 0) {
-			return 0
-	} else {
-			return INFINITY
-	}
-
-//	currentDistance = distanceBetweenBalls(ball1, ball2)
-// make x and y values separate
-// 		x: posX, y: posY, radius: radius, vX: velocityX, vY: velocityY, m: mass
-// nextX(t) = (ball1.x + ball1.vX*t)
-// nextX2(t) = (ball2.x + ball2.vX*t)
-// nextY(t) = (ball1.y + ball1.vY*t)
-// nextY2(t) = (ball2.y + ball2.vY*t)
-// newDistance(t) = Math.sqrt((nextX(t)-nextX2(t))^2) + ((nextY(t)-nextY2(t))^2)
-//console.log(">>>" + ball1.vX  + ":" + ball2.vX + ":" + ball1.vY + ":" + ball2.vY)
-	return (-ball1.x + ball2.x - ball1.y + ball2.y -2*ball1.radius + 2*ball2.radius)/((ball1.vX - ball2.vX) + ball1.vY - ball2.vY)
+function calcDistSquareCoeff(l1, l2, lX1, lX2) {
+	// use pythagoras
+	locDiff = l1-l2
+	velDiff = vl1-vl2
+	return[Math.pow(locDiff, 2), //constant
+				2*locDiff*velDiff, 		// t^1
+				Math.pow(velDiff, 2)]	//t^2
 }
+
+function timeToCollide(ball1,ball2) {
+	coeffX = calcDistSquareCoeff(ball1.x, ball2.x, ball1.vX, ball2.vX)
+	coeffY = calcDistSquareCoeff(ball1.y, ball2.y, ball1.vY, ball2.vY)
+
+	//quadratics
+	c = coeffX[0] + coeffY[0] - Math.pow((ball1.radius + ball2.radius), 2)
+	b = coeffX[1] + coeffY[1]
+	a = coeffX[2] + coeffY[2]
+
+	t1 = (-b + Math.sqrt(Math.pow(b, 2) - 4*a*c))/2*a
+	t2 = (-b - Math.sqrt(Math.pow(b, 2) - 4*a*c))/2*a
+
+	if (t1 > 0 && t2 > 0) {
+		return Math.min(t1, t2)
+	} else if (t1*t2 === 0) {
+		return 0
+	} else if (t1*t2 < 0) {
+		return Math.max(t1, t2)
+	} else {
+		return INFINITY
+	}
+}
+
 //
  b1 = makeBall(1,2, 6,3,4,5) // hit right wall
  b2 = makeBall(8,2, 6, -3,4,5) // hit left wall
