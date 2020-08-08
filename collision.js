@@ -69,14 +69,13 @@ console.log(findCommonPoint(1, 2, 1/2, 4))
 
 
 
-//  function distancebetweenBalls (ball1, ball2) {
-// // 		x: posX, y: posY, radius: radius, vX: velocityX, vY: velocityY, m: mass
-// // 		sqrt((x1-x2)^2 + (y1-y2)^2 - (r1 + r2)
-//  		distanceDots = Math.sprt(Math.pow(ball1.x - ball2.x, 2) + Math.pow(ball1.y - ball2.y, 2))
-//  		distanceBalls = distanceDots - (ball1.r + ball2.r)
-//  	}
-//
-//
+function distancebetweenBalls (ball1, ball2) {
+		x: posX, y: posY, radius: radius, vX: velocityX, vY: velocityY, m: mass
+  		distanceDots = Math.sqrt(Math.pow((ball1.x + ball1.y + (ball1.vX + ball1.vY)*t), 2) + Math.sprt(Math.pow((ball2.x + ball2.y + (ball2.vX + ball2.vY)*t), 2)
+  		distanceBalls = distanceDots - (ball1.r + ball2.r)
+  	}
+
+
 // // TESTS
 // console.log(distanceToWall(10, 10, 600))
 
@@ -108,6 +107,40 @@ function timeToHitHorizontalWall(ball) {
 }
 
 function timeToCollide(ball1,ball2) {
+	// return the time, which will happen in near future.
+	// If there are more than two future times, return near future time only
+	// If there is no future time (meaning all happened already in the past)
+	// return INFINITY
+
+  // (a + b)^2
+	a = ball1.x - ball2.x
+	b = ball1.vX - ball2.vX
+	// (c + d)^2
+	c = ball1.y - ball2.y
+	d = ball1.vY - ball2.vY
+
+	constant = Math.pow(a, 2) + Math.pow(c, 2)
+	coef1 = 2*a*b + 2*c*d // the t's coefficient
+	coef2 = Math.pow(b ,2) + Math.pow(d, 2) // t squared coefficient
+
+  commmonTerm = Math.sqrt(Math.pow(coef1, 2) - 4 * coef2 * constant)
+	time1 = (- coef1 + commmonTerm) / (2 * coef2)
+	time2 = (- coef1 - commmonTerm) / (2 * coef2)
+//	time1 = (-coef1 + Math.sqrt(Math.pow(coef1, 2) - 4*coef2*constant))/2*coef2
+//	time2 = (-coef1 - Math.sqrt(Math.pow(coef1, 2) - 4*coef2*constant))/2*coef2
+
+	if (time1 > 0 && time2 > 0) {
+		return min(time1, time2)
+	} else if (time1 > 0 && time2 < 0) {
+			return time1
+	} else if (time1 < 0 && time2 > 0) {
+			return time2
+	} else if (time1 == 0 || time2 == 0) {
+			return 0
+	} else {
+			return INFINITY
+	}
+
 //	currentDistance = distanceBetweenBalls(ball1, ball2)
 // make x and y values separate
 // 		x: posX, y: posY, radius: radius, vX: velocityX, vY: velocityY, m: mass
@@ -118,12 +151,14 @@ function timeToCollide(ball1,ball2) {
 // newDistance(t) = Math.sqrt((nextX(t)-nextX2(t))^2) + ((nextY(t)-nextY2(t))^2)
 //console.log(">>>" + ball1.vX  + ":" + ball2.vX + ":" + ball1.vY + ":" + ball2.vY)
 	return (-ball1.x + ball2.x - ball1.y + ball2.y -2*ball1.radius + 2*ball2.radius)/((ball1.vX - ball2.vX) + ball1.vY - ball2.vY)
-}=-=
+}
 //
  b1 = makeBall(1,2, 6,3,4,5) // hit right wall
  b2 = makeBall(8,2, 6, -3,4,5) // hit left wall
 //
  console.log("time:" + timeToCollide(b1,b2))
+
+
 
 function moveBall(ball) {
 
