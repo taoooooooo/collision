@@ -139,10 +139,16 @@ function timeToCollide(ball1,ball2) {
 }
 
 //
- b1 = makeBall(1,2, 6,3,4,5) // hit right wall
- b2 = makeBall(8,2, 6, -3,4,5) // hit left wall
+ b1 = makeBall(0,0,1,1,1,5) // hit right wall
+ b2 = makeBall(4,4,1,-1,-1,5) // hit left wall
+ b3 = makeBall(4,0,1,-1,1,5)
+ b4 = makeBall(0,4,1,1,-1,5)
+ b5 = makeBall(2,4,1,0,-1,5)
 //
- console.log("time:" + timeToCollide(b1,b2))
+ console.log("1 2", timeToCollide(b1,b2))
+ console.log("1 3", timeToCollide(b1,b3))
+ console.log("1 4", timeToCollide(b1,b4))
+ console.log("1 5", timeToCollide(b1,b5))
 
 
 
