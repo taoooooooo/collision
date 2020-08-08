@@ -92,9 +92,9 @@ function timeToCollide(ball1,ball2) {
 
 	console.log("****" + a + ':' + b + ':' + c)
 	sqrtPart = Math.sqrt(Math.pow(b, 2) - 4*a*c)
-
-	t1 = (-b + sqrtPart)/2*a
-	t2 = (-b - sqrtPart)/2*a
+// you need to add brackets between 2a for some reason
+	t1 = (-b + sqrtPart)/(2*a)
+	t2 = (-b - sqrtPart)/(2*a)
 
 	if (t1 > 0 && t2 > 0) {
 		return Math.min(t1, t2)
