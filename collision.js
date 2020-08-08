@@ -52,12 +52,12 @@ function findCommonPoint(gradient1, intercept1, gradient2, intercept2) {
 	// (g1 -g2) x = -(i1 - i2)
 	// x = -(i1 - i2) / (g1 - g2)
 	x = -(intercept1 - intercept2) / (gradient1 - gradient2)
-	console.log((intercept1 - intercept2),  (gradient1 - gradient2))
+	// console.log((intercept1 - intercept2),  (gradient1 - gradient2))
 	y = gradient1 * x + intercept1 // y = ax + b
 	return [x, y]
 }
 
-console.log(findCommonPoint(1, 2, 1/2, 4))
+// console.log(findCommonPoint(1, 2, 1/2, 4))
 //
 // gradient1 = ball1.vy/ball1.vx // y = ax + b (a is known)
 // ball1.y = gradient1 * ball1.x + b
@@ -69,11 +69,11 @@ console.log(findCommonPoint(1, 2, 1/2, 4))
 
 
 
-function distancebetweenBalls (ball1, ball2) {
-		x: posX, y: posY, radius: radius, vX: velocityX, vY: velocityY, m: mass
-  		distanceDots = Math.sqrt(Math.pow((ball1.x + ball1.y + (ball1.vX + ball1.vY)*t), 2) + Math.sprt(Math.pow((ball2.x + ball2.y + (ball2.vX + ball2.vY)*t), 2)
-  		distanceBalls = distanceDots - (ball1.r + ball2.r)
-  	}
+// function distancebetweenBalls (ball1, ball2) {
+// 	//	x: posX, y: posY, radius: radius, vX: velocityX, vY: velocityY, m: mass
+//   		distanceDots = Math.sqrt(Math.pow((ball1.x + ball1.y + (ball1.vX + ball1.vY)*t), 2) + Math.sprt(Math.pow((ball2.x + ball2.y + (ball2.vX + ball2.vY)*t), 2)
+//   		distanceBalls = distanceDots - (ball1.r + ball2.r)
+//   	}
 
 
 // // TESTS
@@ -109,7 +109,7 @@ function timeToHitHorizontalWall(ball) {
 function calcDistSquareCoeff(l1, l2, lX1, lX2) {
 	// use pythagoras
 	locDiff = l1-l2
-	velDiff = vl1-vl2
+	velDiff = lX1-lX2
 	return[Math.pow(locDiff, 2), //constant
 				2*locDiff*velDiff, 		// t^1
 				Math.pow(velDiff, 2)]	//t^2
@@ -123,6 +123,8 @@ function timeToCollide(ball1,ball2) {
 	c = coeffX[0] + coeffY[0] - Math.pow((ball1.radius + ball2.radius), 2)
 	b = coeffX[1] + coeffY[1]
 	a = coeffX[2] + coeffY[2]
+
+	console.log("****" + a + ':' + b + ':' + c)
 
 	t1 = (-b + Math.sqrt(Math.pow(b, 2) - 4*a*c))/2*a
 	t2 = (-b - Math.sqrt(Math.pow(b, 2) - 4*a*c))/2*a
@@ -145,10 +147,14 @@ function timeToCollide(ball1,ball2) {
  b4 = makeBall(0,4,1,1,-1,5)
  b5 = makeBall(2,4,1,0,-1,5)
 //
- console.log("1 2", timeToCollide(b1,b2))
- console.log("1 3", timeToCollide(b1,b3))
- console.log("1 4", timeToCollide(b1,b4))
- console.log("1 5", timeToCollide(b1,b5))
+ // console.log("1 2", timeToCollide(b1,b2))
+ // console.log("1 3", timeToCollide(b1,b3))
+ // console.log("1 4", timeToCollide(b1,b4))
+ // console.log("1 5", timeToCollide(b1,b5))
+ // console.log("1 2", calcDistSquareCoeff(0, 4, 1, -1))
+ // console.log("1 3", calcDistSquareCoeff(0, 0, 1, 1))
+ // console.log("1 4", calcDistSquareCoeff(0, 4, 1, -1))
+ // console.log("1 5", calcDistSquareCoeff(0, 2, 1, 0))
 
 
 
