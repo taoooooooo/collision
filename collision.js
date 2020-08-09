@@ -165,7 +165,15 @@ function makeRandBall(max_x_or_y, max_x_or_y, max_radius, max_vX_or_vY, max_vX_o
 									randomInt(max_mass))
 }
 
-makeRandBall(3,4,5,6,7,8)
+function makeRandBalls(numberOfBalls) {
+	//function will create an array of balls
+	ballArray = new Array(numberOfBalls)
+	for (i = 0; i < ballArray.length; i = i + 1) {
+			// each ball has random x and y, vx and vy, radius and mass
+			ballArray[i] = makeRandBall(300, 300, 5, 6, 6, 10)
+	}
+	return ballArray
+}
 
 //	var interval = setInterval(draw, 0);
 
