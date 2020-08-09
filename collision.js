@@ -127,29 +127,29 @@ function timeToCollide(ball1,ball2) {
 
 function moveBall(ball) {
 
-			drawBall();
-			ball.xValue += ball.dx;
-			ball.yValue += ball.dy;
+	drawBall();
+	ball.xValue += ball.dx;
+	ball.yValue += ball.dy;
 
-			if (ball.y + ball.radius > canvas.height) {
-				ball.dy = ball.dy * -1;
-			}
-			if (ball.y + ball.radius< 0) {
-				ball.dy = ball.dy * -1;
-			}
-			if (ball.x + ball.radius > canvas.width) {
-				ball.dx = ball.dx * -1;
-			}
-			if (ball.x + ball.radius < 0) {
-				ball.dx = ball.dx * -1;
-			}
-			/*
-				The check above stops the ball moving off the bottom of the screen.
-			*/
-		}
+	if (ball.y + ball.radius > canvas.height) {
+		ball.dy = ball.dy * -1;
+	}
+	if (ball.y + ball.radius< 0) {
+		ball.dy = ball.dy * -1;
+	}
+	if (ball.x + ball.radius > canvas.width) {
+		ball.dx = ball.dx * -1;
+	}
+	if (ball.x + ball.radius < 0) {
+		ball.dx = ball.dx * -1;
+	}
+	/*
+		The check above stops the ball moving off the bottom of the screen.
+	*/
+}
 
-	//	var interval = setInterval(draw, 0);
+//	var interval = setInterval(draw, 0);
 
-		function reset() {
-			ctx.clearRect(0,0, canvas.width, canvas.height);
+function reset() {
+	ctx.clearRect(0,0, canvas.width, canvas.height);
 }
