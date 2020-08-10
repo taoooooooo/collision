@@ -170,10 +170,28 @@ function makeRandBalls(numberOfBalls) {
 	ballArray = new Array(numberOfBalls)
 	for (i = 0; i < ballArray.length; i = i + 1) {
 			// each ball has random x and y, vx and vy, radius and mass
-			ballArray[i] = makeRandBall(300, 300, 5, 6, 6, 10)
+			ballArray[i] = makeRandBall(600, 600, 50, 6, 6, 10)
 	}
 	return ballArray
 }
+
+function paintBall(ball) {
+	context.beginPath();
+	context.arc(ball.x, ball.y, ball.radius, 0, 2*Math.PI);
+	context.stroke();
+}
+
+function paintBalls(balls) {
+	clearCanvas()
+	for(var ball of balls) {
+		paintBall(ball)
+	}
+}
+
+function clearCanvas() {
+	context.clearRect(0, 0, WALL_MAX_X, WALL_MAX_Y)
+}
+
 
 //	var interval = setInterval(draw, 0);
 
