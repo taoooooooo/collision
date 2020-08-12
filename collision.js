@@ -8,12 +8,19 @@ const canvas = document.getElementById("canvas")
 
 const context = canvas.getContext("2d")
 
+const colours = ['White', 'Silver', 'Gray', 'Black', 'Red', 'Maroon',
+'Yellow', 'Olive', 'Lime', 'Green', 'Aqua', 'Teal', 'Blue', 'Navy',
+'Fuchsia', 'Purple']
+
 
 canvas.height = WALL_MAX_Y
 canvas.width = WALL_MAX_X
 
 function makeBall (posX, posY, radius, velocityX, velocityY, mass) {
-	return { x: posX, y: posY, radius: radius, vX: velocityX, vY: velocityY, m: mass }
+	return { x: posX, y: posY, radius: radius,
+					vX: velocityX, vY: velocityY, m: mass,
+					colour: colours[randomInt(colours.length)]
+				}
 }
 
 function getMovingDirection(v) {
@@ -131,46 +138,53 @@ function timeToCollide(ball1,ball2) {
 
 
 function moveBall(ball) {
+	ball.x = ball.x + ball.vX			// next x ball coordinate =
+	ball.y = ball.y + ball.vY
+}
 
-	drawBall();
-	ball.xValue += ball.dx;
-	ball.yValue += ball.dy;
-
-	if (ball.y + ball.radius > canvas.height) {
-		ball.dy = ball.dy * -1;
+function moveBalls(balls) {
+	for(var ball of balls) {
+		moveBall(ball)
 	}
-	if (ball.y + ball.radius< 0) {
-		ball.dy = ball.dy * -1;
-	}
-	if (ball.x + ball.radius > canvas.width) {
-		ball.dx = ball.dx * -1;
-	}
-	if (ball.x + ball.radius < 0) {
-		ball.dx = ball.dx * -1;
-	}
-	/*
-		The check above stops the ball moving off the bottom of the screen.
-	*/
 }
 
 function randomInt(n) {
 	//returns 0<= random integer < n
-	return Math.floor(Math.random() * n) + 1
+	return Math.floor(Math.random() * n)
 }
 
 function makeRandBall(max_x_or_y, max_x_or_y, max_radius, max_vX_or_vY, max_vX_or_vY, max_mass) {
-	return makeBall(randomInt(max_x_or_y), randomInt(max_x_or_y),
-									randomInt(max_radius),
-									randomInt(max_vX_or_vY), randomInt(max_vX_or_vY),
-									randomInt(max_mass))
+	return makeBall(randomInt(max_x_or_y) + 5, randomInt(max_x_or_y) + 5,
+									randomInt(max_radius) + 5,
+									selectDirection(randomInt(max_vX_or_vY)),
+									selectDirection(randomInt(max_vX_or_vY)),
+									randomInt(max_mass) + 5)
+}
+// if it is =< instead of <=, it will be invalid left hand assigment, syntax error
+function selectDirection(velocity) {
+	probability = Math.random()
+	if (0 <= probability && probability < 0.5) {
+		return velocity
+	} else {
+			return -velocity
+		}
 }
 
+/*
+function makeRandBall(max_x_or_y, max_x_or_y, max_radius, max_vX_or_vY, max_vX_or_vY, max_mass) {
+	return makeBall(randomInt(max_x_or_y) + 5, randomInt(max_x_or_y) + 5,
+									randomInt(max_radius) + 5,
+									randomInt(max_vX_or_vY) + 5, randomInt(max_vX_or_vY) + 5,
+									randomInt(max_mass) + 5)
+} this one is faulty because it only selects velocity in a positive direction
+so every ball goes in the same direction
+*/
 function makeRandBalls(numberOfBalls) {
 	//function will create an array of balls
 	ballArray = new Array(numberOfBalls)
 	for (i = 0; i < ballArray.length; i = i + 1) {
 			// each ball has random x and y, vx and vy, radius and mass
-			ballArray[i] = makeRandBall(600, 600, 50, 6, 6, 10)
+			ballArray[i] = makeRandBall(600, 600, 50, 50, 50, 10)
 	}
 	return ballArray
 }
@@ -178,7 +192,8 @@ function makeRandBalls(numberOfBalls) {
 function paintBall(ball) {
 	context.beginPath();
 	context.arc(ball.x, ball.y, ball.radius, 0, 2*Math.PI);
-	context.stroke();
+	context.fillStyle = ball.colour
+	context.fill();
 }
 
 function paintBalls(balls) {
@@ -191,8 +206,24 @@ function paintBalls(balls) {
 function clearCanvas() {
 	context.clearRect(0, 0, WALL_MAX_X, WALL_MAX_Y)
 }
+//
+function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms))
+}
 
-
+async function loop() {
+	balls = makeRandBalls(20)
+//	paintBalls(balls)
+	// repeats here
+	i = 0
+	while (i < 100) {
+	paintBalls(balls)
+	moveBalls(balls)
+	await sleep(100) //
+	i++;
+	}
+	// this loop was going too fast so sleep function was needed
+}
 //	var interval = setInterval(draw, 0);
 
 function reset() {
