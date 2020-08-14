@@ -219,7 +219,7 @@ async function loop() {
 	while (i < 100) {
 	paintBalls(balls)
 	moveBalls(balls)
-	await sleep(100) //
+	await sleep(90) //
 	i++;
 	}
 	// this loop was going too fast so sleep function was needed
