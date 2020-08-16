@@ -1,7 +1,6 @@
 const WALL_MAX_X = 600
 const WALL_MAX_Y = 600
 
-const INFINITY = Number.MAX_VALUE
 const TIME_UNIT = 1 // 1 second
 
 const canvas = document.getElementById("canvas")
@@ -42,7 +41,7 @@ function distanceToWall (x_or_y, vx_or_vy, max_x_or_y) {
       return x_or_y
     default:
 //      console.log("3")
-      return INFINITY
+      return Infinity
    }
 }
 
@@ -62,7 +61,7 @@ function distanceToWall (x_or_y, vx_or_vy, max_x_or_y) {
 b1 = makeBall(1,2,3,4,5) // hit right wall
 b2 = makeBall(4,6, 7, -10, 10) // hit left wall
 b3 = makeBall(34, 100, 122, 0,333) // hit no vertical wall
-INFINITY === distanceToWall(b3)
+Infinity === distanceToWall(b3)
 
 distance
 */
@@ -70,8 +69,8 @@ distance
 function timeToHitWall(x_or_y, vx_or_vy, max_x_or_y) {
   distance = distanceToWall(x_or_y, vx_or_vy, max_x_or_y)
   // console.log("1 " + distance)
-  if (distance === INFINITY) {
-    return INFINITY
+  if (distance === Infinity) {
+    return Infinity
   }
   return (distance / Math.abs(vx_or_vy))
 }
@@ -102,7 +101,7 @@ function timeToCollide(ball1,ball2) {
 	b = coeffX[1] + coeffY[1]
 	a = coeffX[2] + coeffY[2]
 
-	console.log("****" + a + ':' + b + ':' + c)
+	//console.log("****" + a + ':' + b + ':' + c)
 	sqrtPart = Math.sqrt(Math.pow(b, 2) - 4*a*c)
 // you need to add brackets between 2a for some reason
 	t1 = (-b + sqrtPart)/(2*a)
@@ -115,7 +114,7 @@ function timeToCollide(ball1,ball2) {
 	} else if (t1*t2 < 0) {
 		return Math.max(t1, t2)
 	} else {
-		return INFINITY
+		return Infinity
 	}
 }
 
@@ -224,6 +223,16 @@ function sleep(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+function changeSomeForcesOfBalls(balls) {
+	for (var i = 0; i < balls.length - 1; i++) {
+		for	(var j = i + 1; j < balls.length; j++) {
+			console.log((timeToCollide(balls[i], balls[j])))
+			if (timeToCollide(balls[i], balls[j]) === 0) {
+				updateForcesAfterCollision(balls[i], balls[j])
+			}
+		}
+	}
+}
 
 const oneTick = 90
 async function loop(seconds) {
@@ -234,6 +243,7 @@ async function loop(seconds) {
 	while (0 < durationMs) {
 		paintBalls(balls)
 		moveBalls(balls)
+		changeSomeForcesOfBalls(balls)
 		await sleep(oneTick) //
 		durationMs = durationMs - oneTick
 	}
