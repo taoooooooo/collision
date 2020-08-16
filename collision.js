@@ -208,31 +208,36 @@ function getForceOfBall(ball) {
 }
 
 function updateForcesAfterCollision(ball1, ball2) {
-	ball1.vX = ball1.vX + force.fX
-	ball1.vY = ball1.vY + force.fY
-	ball2.vX = ball2.vX + force.fX
-	ball2.vY = ball2.vY + force.fY
+	force1 = getForceOfBall(ball1)
+	force2 = getForceOfBall(ball2)
+	ball1.vX = ball1.vX + force1.fX
+	ball1.vY = ball1.vY + force1.fY
+	ball2.vX = ball2.vX + force2.fX
+	ball2.vY = ball2.vY + force2.fY
 }
 
 function clearCanvas() {
 	context.clearRect(0, 0, WALL_MAX_X, WALL_MAX_Y)
 }
-//
+// ms is milleseconds
 function sleep(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-async function loop() {
+
+const oneTick = 90
+async function loop(seconds) {
 	balls = makeRandBalls(20)
 //	paintBalls(balls)
 	// repeats here
-	i = 0
-	while (i < 100) {
-	paintBalls(balls)
-	moveBalls(balls)
-	await sleep(90) //
-	i++;
+	durationMs = 1000 * seconds
+	while (0 < durationMs) {
+		paintBalls(balls)
+		moveBalls(balls)
+		await sleep(oneTick) //
+		durationMs = durationMs - oneTick
 	}
+
 	// this loop was going too fast so sleep function was needed
 }
 //	var interval = setInterval(draw, 0);
