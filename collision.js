@@ -112,7 +112,13 @@ function timeToCollide(ball1,ball2) {
 	} else if (t1*t2 === 0) {
 		return 0
 	} else if (t1*t2 < 0) {
-		return Math.max(t1, t2)
+		negativeTime = Math.min(t1, t2)
+		positiveTime = Math.max(t1, t2)
+		if (-1 < negativeTime && negativeTime < 0) {
+			return negativeTime
+		} else {
+			return positiveTime
+		}
 	} else {
 		return Infinity
 	}
@@ -227,7 +233,7 @@ function changeSomeForcesOfBalls(balls) {
 	for (var i = 0; i < balls.length - 1; i++) {
 		for	(var j = i + 1; j < balls.length; j++) {
 			console.log((timeToCollide(balls[i], balls[j])))
-			if (timeToCollide(balls[i], balls[j]) === 0) {
+			if (timeToCollide(balls[i], balls[j]) <= 0) {
 				updateForcesAfterCollision(balls[i], balls[j])
 			}
 		}
