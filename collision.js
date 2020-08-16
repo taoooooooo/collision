@@ -203,6 +203,17 @@ function paintBalls(balls) {
 	}
 }
 
+function getForceOfBall(ball) {
+	force = {fX: ball.m * ball.vX, fY: ball.m * ball.vY}
+}
+
+function updateForcesAfterCollision(ball1, ball2) {
+	ball1.vX = ball1.vX + force.fX
+	ball1.vY = ball1.vY + force.fY
+	ball2.vX = ball2.vX + force.fX
+	ball2.vY = ball2.vY + force.fY
+}
+
 function clearCanvas() {
 	context.clearRect(0, 0, WALL_MAX_X, WALL_MAX_Y)
 }
@@ -225,6 +236,8 @@ async function loop() {
 	// this loop was going too fast so sleep function was needed
 }
 //	var interval = setInterval(draw, 0);
+
+
 
 function reset() {
 	ctx.clearRect(0,0, canvas.width, canvas.height);
