@@ -209,16 +209,20 @@ function paintBalls(balls) {
 }
 
 function getForceOfBall(ball) {
-	force = {fX: ball.m * ball.vX, fY: ball.m * ball.vY}
+	return {fX: ball.m * ball.vX, fY: ball.m * ball.vY}
 }
 
 function updateForcesAfterCollision(ball1, ball2) {
 	force1 = getForceOfBall(ball1)
 	force2 = getForceOfBall(ball2)
-	ball1.vX = ball1.vX + force1.fX
-	ball1.vY = ball1.vY + force1.fY
-	ball2.vX = ball2.vX + force2.fX
-	ball2.vY = ball2.vY + force2.fY
+	console.log("***1 (" + ball1.vX + ", " + ball1.vY + ") => " +
+	"(" + (ball1.vX + force1.fX) + ", " +  (ball1.vY + force1.fY) + ")")
+	console.log("***2 (" + ball2.vX + ", " + ball2.vY + ") => " +
+	"(" + (ball2.vX + force2.fX) + ", " +  (ball2.vY + force2.fY) + ")")
+	ball1.vX = force1.fX + force2.fX
+	ball1.vY = force1.fY + force2.fY
+	ball2.vX = force1.fX + force2.fX
+	ball2.vY = force1.fY + force2.fY
 }
 
 function clearCanvas() {
@@ -232,7 +236,6 @@ function sleep(ms) {
 function changeSomeForcesOfBalls(balls) {
 	for (var i = 0; i < balls.length - 1; i++) {
 		for	(var j = i + 1; j < balls.length; j++) {
-			console.log((timeToCollide(balls[i], balls[j])))
 			if (timeToCollide(balls[i], balls[j]) <= 0) {
 				updateForcesAfterCollision(balls[i], balls[j])
 			}
