@@ -158,13 +158,13 @@ function randomInt(n) {
 	return Math.floor(Math.random() * n)
 }
 
-function makeRandBall(max_x_or_y, max_x_or_y, max_radius, max_vX_or_vY, max_vX_or_vY, max_mass) {
-	return makeBall(randomInt(max_x_or_y) + 5, randomInt(max_x_or_y) + 5,
-									randomInt(max_radius) + 5,
-									selectDirection(randomInt(max_vX_or_vY)),
-									selectDirection(randomInt(max_vX_or_vY)),
-									randomInt(max_mass) + 5)
-}
+// function makeRandBall(max_x_or_y, max_x_or_y, max_radius, max_vX_or_vY, max_vX_or_vY, max_mass) {
+// 	return makeBall(randomInt(max_x_or_y) + 5, randomInt(max_x_or_y) + 5,
+// 									randomInt(max_radius) + 5,
+// 									selectDirection(randomInt(max_vX_or_vY)),
+// 									selectDirection(randomInt(max_vX_or_vY)),
+// 									randomInt(max_mass) + 5)
+// }
 // if it is =< instead of <=, it will be invalid left hand assigment, syntax error
 function selectDirection(velocity) {
 	probability = Math.random()
