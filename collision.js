@@ -243,12 +243,25 @@ function changeSomeForcesOfBalls(balls) {
 	}
 }
 
- function areBallsOverlapped(ball1, ball2) {
-	d = Math.sqrt(Math.pow((ball2.x-ball1.x), 2) +
-	 							Math.pow((ball2.y-ball1.y), 2))
-	console.log(d)
-	return (d < ball1.r + ball2.r)
+function createNonOverlappingBall(existingBalls) {
+    newBall = makeRandBall(600, 600, 50, 50, 50, 10)
+    for (var ball of existingBalls) {
+        if (areBallsOverlapped(ball, newBall)) {
+            return createNonOverlappingBall(existingBalls);
+        }
+    }
+    return newBall;
 }
+
+function makeRandBalls(numberOfBalls) {
+        //function will create an array of balls
+        ballArray = new Array(numberOfBalls);
+        for (i = 0; i < ballArray.length; i = i + 1) {
+            ballArray[i] = createNonOverlappingBall(ballArray.slice(0, i));
+        }
+        return ballArray;
+}
+
 
 const oneTick = 90
 async function loop(seconds) {
