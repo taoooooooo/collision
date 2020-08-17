@@ -158,13 +158,13 @@ function randomInt(n) {
 	return Math.floor(Math.random() * n)
 }
 
-// function makeRandBall(max_x_or_y, max_x_or_y, max_radius, max_vX_or_vY, max_vX_or_vY, max_mass) {
-// 	return makeBall(randomInt(max_x_or_y) + 5, randomInt(max_x_or_y) + 5,
-// 									randomInt(max_radius) + 5,
-// 									selectDirection(randomInt(max_vX_or_vY)),
-// 									selectDirection(randomInt(max_vX_or_vY)),
-// 									randomInt(max_mass) + 5)
-// }
+function makeRandBall(max_x_or_y, max_x_or_y, max_radius, max_vX_or_vY, max_vX_or_vY, max_mass) {
+	return makeBall(randomInt(max_x_or_y) + 5, randomInt(max_x_or_y) + 5,
+									randomInt(max_radius) + 5,
+									selectDirection(randomInt(max_vX_or_vY)),
+									selectDirection(randomInt(max_vX_or_vY)),
+									randomInt(max_mass) + 5)
+}
 // if it is =< instead of <=, it will be invalid left hand assigment, syntax error
 function selectDirection(velocity) {
 	probability = Math.random()
@@ -184,15 +184,15 @@ function makeRandBall(max_x_or_y, max_x_or_y, max_radius, max_vX_or_vY, max_vX_o
 } this one is faulty because it only selects velocity in a positive direction
 so every ball goes in the same direction
 */
-function makeRandBalls(numberOfBalls) {
-	//function will create an array of balls
-	ballArray = new Array(numberOfBalls)
-	for (i = 0; i < ballArray.length; i = i + 1) {
-			// each ball has random x and y, vx and vy, radius and mass
-			ballArray[i] = makeRandBall(600, 600, 50, 50, 50, 10)
-	}
-	return ballArray
-}
+// function makeRandBalls(numberOfBalls) {
+// 	//function will create an array of balls
+// 	ballArray = new Array(numberOfBalls)
+// 	for (i = 0; i < ballArray.length; i = i + 1) {
+// 			// each ball has random x and y, vx and vy, radius and mass
+// 			ballArray[i] = makeRandBall(600, 600, 50, 50, 50, 10)
+// 	}
+// 	return ballArray
+// }
 
 function paintBall(ball) {
 	context.beginPath();
