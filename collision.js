@@ -243,6 +243,13 @@ function changeSomeForcesOfBalls(balls) {
 	}
 }
 
+ function areBallsOverlapped(ball1, ball2) {
+	d = Math.sqrt(Math.pow((ball2.x-ball1.x), 2) +
+	 							Math.pow((ball2.y-ball1.y), 2))
+	console.log(d)
+	return (d < ball1.r + ball2.r)
+}
+
 const oneTick = 90
 async function loop(seconds) {
 	balls = makeRandBalls(20)
