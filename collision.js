@@ -211,7 +211,8 @@ function getForceOfBall(ball) {
 	return {fX: ball.m * ball.vX, fY: ball.m * ball.vY};
 }
 
-function updateForcesAfterCollision(ball1, ball2) {
+function updateVelocityAfterCollision(ball1, ball2) {
+	// ball1.vX * ball1.m +
 	force1 = getForceOfBall(ball1);
 	force2 = getForceOfBall(ball2);
 	ball1.vX = force1.fX + force2.fX;
@@ -232,7 +233,7 @@ function changeSomeForcesOfBalls(balls) {
 	for (var i = 0; i < balls.length - 1; i++) {
 		for	(var j = i + 1; j < balls.length; j++) {
 			if (timeToCollide(balls[i], balls[j]) <= 0) {
-				updateForcesAfterCollision(balls[i], balls[j]);
+				updateVelocityAfterCollision(balls[i], balls[j]);
 			}
 		}
 	}
