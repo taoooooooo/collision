@@ -1,4 +1,4 @@
-const WALL_MAX_X = 600
+const WALL_MAX_X = 900
 const WALL_MAX_Y = 600
 
 const TIME_UNIT = 1 // 1 second
@@ -244,7 +244,7 @@ function changeSomeForcesOfBalls(balls) {
 }
 
 function createNonOverlappingBall(existingBalls) {
-    newBall = makeRandBall(600, 600, 50, 50, 50, 10)
+    newBall = makeRandBall(900, 600, 50, 50, 50, 10)
     for (var ball of existingBalls) {
         if (areBallsOverlapped(ball, newBall)) {
             return createNonOverlappingBall(existingBalls);
