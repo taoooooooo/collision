@@ -17,7 +17,7 @@ canvas.width = WALL_MAX_X;
 
 function makeBall(posX, posY, radius, velocityX, velocityY) {
 	return { x: posX, y: posY, radius: radius,
-					vX: velocityX, vY: velocityY, m: radius,
+					vX: velocityX, vY: velocityY, m: (radius/50),
 					colour: colours[randomInt(colours.length)]
 				};
 }
@@ -207,18 +207,34 @@ function paintBalls(balls) {
 	}
 }
 
-function getForceOfBall(ball) {
+function getMomentumOfBall(ball) {
 	return {fX: ball.m * ball.vX, fY: ball.m * ball.vY};
 }
 
 function updateVelocityAfterCollision(ball1, ball2) {
-	// ball1.vX * ball1.m +
-	force1 = getForceOfBall(ball1);
-	force2 = getForceOfBall(ball2);
+	// momentum =
+	//impulse (change in momentum)
+	force1 = getMomentumOfBall(ball1);
+	force2 = getMomentumOfBall(ball2);
 	ball1.vX = force1.fX + force2.fX;
 	ball1.vY = force1.fY + force2.fY;
 	ball2.vX = force1.fX + force2.fX;
 	ball2.vY = force1.fY + force2.fY;
+}
+
+function wallCollision() {
+	if (ball.y + ball.radius > canvas.height) {
+			ball.vY = ball.vY * -1;
+			}
+	if (ball.y + ball.radius < 0) {
+			ball.vY = ball.vY * -1;
+			}
+	if (ball.x + ball.radius > canvas.width) {
+			ball.vX = ball.vX * -1;
+			}
+	if (ball.x + ball.radius < 0) {
+			ball.vX = ball.vX * -1;
+			}
 }
 
 function clearCanvas() {
@@ -242,7 +258,6 @@ function changeSomeForcesOfBalls(balls) {
 function areBallsOverlapped(ball1, ball2) {
  d = Math.sqrt(Math.pow((ball2.x - ball1.x), 2) +
 							 Math.pow((ball2.y - ball1.y), 2));
- console.log(d);
  return (d < ball1.radius + ball2.radius);
 }
 
@@ -264,7 +279,6 @@ function makeRandBalls(numberOfBalls) {
         }
         return ballArray;
 }
-
 
 const oneTick = 90;
 async function loop(seconds) {
