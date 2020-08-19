@@ -243,6 +243,13 @@ function changeSomeForcesOfBalls(balls) {
 	}
 }
 
+function areBallsOverlapped(ball1, ball2) {
+ d = Math.sqrt(Math.pow((ball2.x-ball1.x), 2) +
+							 Math.pow((ball2.y-ball1.y), 2))
+ console.log(d)
+ return (d < ball1.radius + ball2.radius)
+}
+
 function createNonOverlappingBall(existingBalls) {
     newBall = makeRandBall(900, 600, 50, 50, 50, 10)
     for (var ball of existingBalls) {
@@ -263,7 +270,7 @@ function makeRandBalls(numberOfBalls) {
 }
 
 
-const oneTick = 90
+const oneTick = 900
 async function loop(seconds) {
 	balls = makeRandBalls(20)
 //	paintBalls(balls)
