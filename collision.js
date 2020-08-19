@@ -15,9 +15,9 @@ const colours = ['White', 'Silver', 'Gray', 'Black', 'Red', 'Maroon',
 canvas.height = WALL_MAX_Y;
 canvas.width = WALL_MAX_X;
 
-function makeBall(posX, posY, radius, velocityX, velocityY, mass) {
+function makeBall(posX, posY, radius, velocityX, velocityY) {
 	return { x: posX, y: posY, radius: radius,
-					vX: velocityX, vY: velocityY, m: mass,
+					vX: velocityX, vY: velocityY, m: radius,
 					colour: colours[randomInt(colours.length)]
 				};
 }
@@ -125,11 +125,11 @@ function timeToCollide(ball1, ball2) {
 }
 
 //
- b1 = makeBall(0, 0, 1, 1, 1, 5); // hit right wall
- b2 = makeBall(4, 4, 1, -1, -1, 5); // hit left wall
- b3 = makeBall(4, 0, 1, -1, 1, 5);
- b4 = makeBall(0, 4, 1, 1, -1, 5);
- b5 = makeBall(2, 4, 1, 0, -1, 5);
+ b1 = makeBall(0, 0, 1, 1, 1); // hit right wall
+ b2 = makeBall(4, 4, 1, -1, -1); // hit left wall
+ b3 = makeBall(4, 0, 1, -1, 1);
+ b4 = makeBall(0, 4, 1, 1, -1);
+ b5 = makeBall(2, 4, 1, 0, -1);
 //
  // console.log("1 2", timeToCollide(b1,b2))
  // console.log("1 3", timeToCollide(b1,b3))
@@ -158,12 +158,11 @@ function randomInt(n) {
 	return Math.floor(Math.random() * n);
 }
 
-function makeRandBall(max_x_or_y, max_x_or_y, max_radius, max_vX_or_vY, max_vX_or_vY, max_mass) {
+function makeRandBall(max_x_or_y, max_x_or_y, max_radius, max_vX_or_vY, max_vX_or_vY) {
 	return makeBall(randomInt(max_x_or_y) + 5, randomInt(max_x_or_y) + 5,
 									randomInt(max_radius) + 5,
 									selectDirection(randomInt(max_vX_or_vY)),
-									selectDirection(randomInt(max_vX_or_vY)),
-									randomInt(max_mass) + 5);
+									selectDirection(randomInt(max_vX_or_vY)));
 }
 // if it is =< instead of <=, it will be invalid left hand assigment, syntax error
 function selectDirection(velocity) {
@@ -176,11 +175,11 @@ function selectDirection(velocity) {
 }
 
 /*
-function makeRandBall(max_x_or_y, max_x_or_y, max_radius, max_vX_or_vY, max_vX_or_vY, max_mass) {
+function makeRandBall(max_x_or_y, max_x_or_y, max_radius, max_vX_or_vY, max_vX_or_vY) {
 	return makeBall(randomInt(max_x_or_y) + 5, randomInt(max_x_or_y) + 5,
 									randomInt(max_radius) + 5,
 									randomInt(max_vX_or_vY) + 5, randomInt(max_vX_or_vY) + 5,
-									randomInt(max_mass) + 5)
+									)
 } this one is faulty because it only selects velocity in a positive direction
 so every ball goes in the same direction
 */
@@ -215,10 +214,6 @@ function getForceOfBall(ball) {
 function updateForcesAfterCollision(ball1, ball2) {
 	force1 = getForceOfBall(ball1);
 	force2 = getForceOfBall(ball2);
-	console.log('***1 (' + ball1.vX + ', ' + ball1.vY + ') => ' +
-	'(' + (ball1.vX + force1.fX) + ', ' + (ball1.vY + force1.fY) + ')');
-	console.log('***2 (' + ball2.vX + ', ' + ball2.vY + ') => ' +
-	'(' + (ball2.vX + force2.fX) + ', ' + (ball2.vY + force2.fY) + ')');
 	ball1.vX = force1.fX + force2.fX;
 	ball1.vY = force1.fY + force2.fY;
 	ball2.vX = force1.fX + force2.fX;
@@ -251,7 +246,7 @@ function areBallsOverlapped(ball1, ball2) {
 }
 
 function createNonOverlappingBall(existingBalls) {
-    newBall = makeRandBall(900, 600, 50, 50, 50, 10);
+    newBall = makeRandBall(900, 600, 50, 50, 50);
     for (var ball of existingBalls) {
         if (areBallsOverlapped(ball, newBall)) {
             return createNonOverlappingBall(existingBalls);
@@ -270,7 +265,7 @@ function makeRandBalls(numberOfBalls) {
 }
 
 
-const oneTick = 900;
+const oneTick = 90;
 async function loop(seconds) {
 	balls = makeRandBalls(20);
 //	paintBalls(balls)
