@@ -1,3 +1,82 @@
+// Copy from https://github.com/mourner/tinyqueue
+
+class TinyQueue {
+    constructor(data = [], compare = defaultCompare) {
+        this.data = data;
+        this.length = this.data.length;
+        this.compare = compare;
+
+        if (this.length > 0) {
+            for (let i = (this.length >> 1) - 1; i >= 0; i--) this._down(i);
+        }
+    }
+
+    push(item) {
+        this.data.push(item);
+        this._up(this.length++);
+    }
+
+    pop() {
+        if (this.length === 0) return undefined;
+
+        const top = this.data[0];
+        const bottom = this.data.pop();
+
+        if (--this.length > 0) {
+            this.data[0] = bottom;
+            this._down(0);
+        }
+
+        return top;
+    }
+
+    peek() {
+        return this.data[0];
+    }
+
+    _up(pos) {
+        const {data, compare} = this;
+        const item = data[pos];
+
+        while (pos > 0) {
+            const parent = (pos - 1) >> 1;
+            const current = data[parent];
+            if (compare(item, current) >= 0) break;
+            data[pos] = current;
+            pos = parent;
+        }
+
+        data[pos] = item;
+    }
+
+    _down(pos) {
+        const {data, compare} = this;
+        const halfLength = this.length >> 1;
+        const item = data[pos];
+
+        while (pos < halfLength) {
+            let bestChild = (pos << 1) + 1; // initially it is the left child
+            const right = bestChild + 1;
+
+            if (right < this.length && compare(data[right], data[bestChild]) < 0) {
+                bestChild = right;
+            }
+            if (compare(data[bestChild], item) >= 0) break;
+
+            data[pos] = data[bestChild];
+            pos = bestChild;
+        }
+
+        data[pos] = item;
+    }
+}
+
+function defaultCompare(a, b) {
+    return a < b ? -1 : a > b ? 1 : 0;
+}
+
+
+// -------------
 const WALL_MAX_X = 900;
 const WALL_MAX_Y = 600;
 
@@ -41,7 +120,7 @@ function distanceToWall(x_or_y, vx_or_vy, max_x_or_y) {
       return x_or_y;
     default:
 //      console.log("3")
-      return Infinity;
+      return Number.MAX_VALUE;
    }
 }
 
@@ -61,7 +140,7 @@ function distanceToWall(x_or_y, vx_or_vy, max_x_or_y) {
 b1 = makeBall(1,2,3,4,5) // hit right wall
 b2 = makeBall(4,6, 7, -10, 10) // hit left wall
 b3 = makeBall(34, 100, 122, 0,333) // hit no vertical wall
-Infinity === distanceToWall(b3)
+Number.MAX_VALUE === distanceToWall(b3)
 
 distance
 */
@@ -69,8 +148,8 @@ distance
 function timeToHitWall(x_or_y, vx_or_vy, max_x_or_y) {
   distance = distanceToWall(x_or_y, vx_or_vy, max_x_or_y);
   // console.log("1 " + distance)
-  if (distance === Infinity) {
-    return Infinity;
+  if (distance === Number.MAX_VALUE) {
+    return Number.MAX_VALUE;
   }
   return (distance / Math.abs(vx_or_vy));
 }
@@ -112,15 +191,9 @@ function timeToCollide(ball1, ball2) {
 	} else if (t1 * t2 === 0) {
 		return 0;
 	} else if (t1 * t2 < 0) {
-		negativeTime = Math.min(t1, t2);
-		positiveTime = Math.max(t1, t2);
-		if (-1 < negativeTime && negativeTime < 0) {
-			return negativeTime;
-		} else {
-			return positiveTime;
-		}
+		return Math.max(t1, t2);
 	} else {
-		return Infinity;
+		return Number.MAX_VALUE;
 	}
 }
 
@@ -142,14 +215,15 @@ function timeToCollide(ball1, ball2) {
 
 
 
-function moveBall(ball) {
-	ball.x = ball.x + ball.vX;			// next x ball coordinate =
-	ball.y = ball.y + ball.vY;
+function moveBall(ball, time) {
+
+	ball.x = ball.x + time * ball.vX;			// next x ball coordinate =
+	ball.y = ball.y + time * ball.vY;
 }
 
-function moveBalls(balls) {
+function moveBalls(balls, time) {
 	for (var ball of balls) {
-		moveBall(ball);
+		moveBall(ball, time);
 	}
 }
 
@@ -245,10 +319,14 @@ function sleep(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function changeSomeForcesOfBalls(balls) {
+//pairCollision = timeToCollide(ball1, ball2)
+
+function changeSomeForcesOfBalls(pairCollision) {
 	for (var i = 0; i < balls.length - 1; i++) {
 		for	(var j = i + 1; j < balls.length; j++) {
-			if (timeToCollide(balls[i], balls[j]) <= 0) {
+			time = timeToCollide(balls[i], balls[j]);
+		//	console.log(time + ":" + (time === 0));
+			if (timeToCollide(balls[i], balls[j]) === 0) {
 				updateVelocityAfterCollision(balls[i], balls[j]);
 			}
 		}
@@ -271,6 +349,26 @@ function createNonOverlappingBall(existingBalls) {
     return newBall;
 }
 
+function makeCollisionEvent(ball1, ball2) {
+	return {time: timeToCollide(ball1, ball2), ball1: ball1, ball2: ball2}
+}
+
+function calculateTimeToMove(balls) {
+	var queue = new TinyQueue([], function(event1, event2) {
+		return event1.time - event2.time;
+	});
+	// build queue
+	for (var i = 0; i < balls.length - 1; i++) {
+		for	(var j = i + 1; j < balls.length; j++) {
+				event = makeCollisionEvent(balls[i], balls[j]);
+				queue.push(event);
+		}
+	}
+	earliestEvent = queue.pop();
+	// the default time is '1' for unit velocity.
+	return Math.min(1, earliestEvent.time);
+}
+
 function makeRandBalls(numberOfBalls) {
         //function will create an array of balls
         ballArray = new Array(numberOfBalls);
@@ -288,7 +386,9 @@ async function loop(seconds) {
 	durationMs = 1000 * seconds;
 	while (0 < durationMs) {
 		paintBalls(balls);
-		moveBalls(balls);
+		time = calculateTimeToMove(balls)
+		console.log(time)
+		moveBalls(balls, time);
 		changeSomeForcesOfBalls(balls);
 		await sleep(oneTick); //
 		durationMs = durationMs - oneTick;
