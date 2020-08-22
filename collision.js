@@ -533,16 +533,20 @@ function timeToCollide(ball1, ball2) {
 
 
 function moveBall(ball, time) {
-  if (time > 0) {
     ball.x = ball.x + time * ball.vX;			// next x ball coordinate =
   	ball.y = ball.y + time * ball.vY;
-  }
-
 }
 
-function moveBalls(balls, time) {
+function moveBalls(balls) {
+  [events, nextEarliestTime] = earlyCollisionEvents(balls)
+  eventTime = events[0].time
+
+  if (eventTime === 0) {
+    changeForcesOfCollidingBalls(events);
+  }
 	for (var ball of balls) {
-		moveBall(ball, time);
+		moveBall(ball, (eventTime === 0) ? Math.min(nextEarliestTime, 1)
+    : Math.min(eventTime, 1));
 	}
 }
 
@@ -638,16 +642,10 @@ function sleep(ms) {
 
 //pairCollision = timeToCollide(ball1, ball2)
 
-function changeSomeForcesOfBalls(pairCollision) {
-	for (var i = 0; i < balls.length - 1; i++) {
-		for	(var j = i + 1; j < balls.length; j++) {
-			time = timeToCollide(balls[i], balls[j]);
-		//	console.log(time + ":" + (time === 0));
-			if (timeToCollide(balls[i], balls[j]) === 0) {
-				updateVelocityAfterCollision(balls[i], balls[j]);
-			}
-		}
-	}
+function changeForcesOfCollidingBalls(events) {
+  for (const event of events) {
+    updateVelocityAfterCollision(event.ball1, event.ball2);
+  }
 }
 
 function areBallsOverlapped(ball1, ball2) {
@@ -670,7 +668,8 @@ function makeCollisionEvent(ball1, ball2) {
 	return {time: timeToCollide(ball1, ball2), ball1: ball1, ball2: ball2}
 }
 
-function calculateTimeToMove(balls) {
+function earlyCollisionEvents(balls) {
+  // return array of events, which will occur the earliest time
   var queue = new PriorityQueue({ comparator: function(event1, event2) {
     return event1.time - event2.time;
   }})
@@ -682,9 +681,14 @@ function calculateTimeToMove(balls) {
 				queue.queue(event);
 		}
 	}
-	earliestEvent = queue.dequeue();
-	// the default time is '1' for unit velocity.
-	return Math.min(1, earliestEvent.time);
+  earlyTime = queue.peek().time;
+	earliestEvents = [];
+  do {
+    event = queue.dequeue()
+    earliestEvents.push(event)
+  } while (earlyTime === queue.peek().time)
+
+	return [earliestEvents, queue.peek().time]
 }
 
 function makeRandBalls(numberOfBalls) {
@@ -696,7 +700,7 @@ function makeRandBalls(numberOfBalls) {
         return ballArray;
 }
 
-const oneTick = 900;
+const oneTick = 90;
 async function loop(seconds) {
 	balls = makeRandBalls(20);
 //	paintBalls(balls)
@@ -704,10 +708,7 @@ async function loop(seconds) {
 	durationMs = 1000 * seconds;
 	while (0 < durationMs) {
 		paintBalls(balls);
-		time = calculateTimeToMove(balls)
-		console.log(time)
-		moveBalls(balls, time);
-		changeSomeForcesOfBalls(balls);
+		moveBalls(balls);
 		await sleep(oneTick); //
 		durationMs = durationMs - oneTick;
 	}
