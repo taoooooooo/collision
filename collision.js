@@ -389,6 +389,8 @@ module.exports = BinaryHeapStrategy = (function() {
 });
 
 // -------------
+
+
 const WALL_MAX_X = 900;
 const WALL_MAX_Y = 600;
 
@@ -514,13 +516,13 @@ function timeToCollide(ball1, ball2) {
 	}
 }
 
-//
+/*
  b1 = makeBall(0, 0, 1, 1, 1); // hit right wall
  b2 = makeBall(4, 4, 1, -1, -1); // hit left wall
  b3 = makeBall(4, 0, 1, -1, 1);
  b4 = makeBall(0, 4, 1, 1, -1);
  b5 = makeBall(2, 4, 1, 0, -1);
-//
+*/
  // console.log("1 2", timeToCollide(b1,b2))
  // console.log("1 3", timeToCollide(b1,b3))
  // console.log("1 4", timeToCollide(b1,b4))
@@ -537,16 +539,22 @@ function moveBall(ball, time) {
   	ball.y = ball.y + time * ball.vY;
 }
 
+const errorOfMargin = 0.005
+function isSameTime(time1, time2) {
+  return Math.abs((time1 - time2)) < errorOfMargin
+}
+
 function moveBalls(balls) {
   [events, nextEarliestTime] = earlyCollisionEvents(balls)
   eventTime = events[0].time
 
-  if (eventTime === 0) {
+  if (isSameTime(eventTime, errorOfMargin)) {
     changeForcesOfCollidingBalls(events);
   }
 	for (var ball of balls) {
-		moveBall(ball, (eventTime === 0) ? Math.min(nextEarliestTime, 1)
-    : Math.min(eventTime, 1));
+		moveBall(ball, eventTime)
+    ? Math.min(nextEarliestTime, 1)
+    : Math.min(eventTime, 1);
 	}
 }
 
@@ -556,10 +564,14 @@ function randomInt(n) {
 }
 
 function makeRandBall(max_x_or_y, max_x_or_y, max_radius, max_vX_or_vY, max_vX_or_vY) {
-	return makeBall(randomInt(max_x_or_y) + 5, randomInt(max_x_or_y) + 5,
-									randomInt(max_radius) + 5,
-									selectDirection(randomInt(max_vX_or_vY)),
-									selectDirection(randomInt(max_vX_or_vY)));
+	// return makeBall(randomInt(max_x_or_y) + 5, randomInt(max_x_or_y) + 5,
+	// 								randomInt(max_radius) + 5,
+	// 								selectDirection(randomInt(max_vX_or_vY)),
+	// 								selectDirection(randomInt(max_vX_or_vY)));
+  return makeBall(randomInt(max_x_or_y) + 5, randomInt(max_x_or_y) + 5,
+                  20,
+                  selectDirection(randomInt(10)),
+                  selectDirection(randomInt(10)));
 }
 // if it is =< instead of <=, it will be invalid left hand assigment, syntax error
 function selectDirection(velocity) {
@@ -608,14 +620,31 @@ function getMomentumOfBall(ball) {
 	return {fX: ball.m * ball.vX, fY: ball.m * ball.vY};
 }
 
+// function updateVelocityAfterCollision(ball1, ball2) {
+// 	force1 = getMomentumOfBall(ball1);
+// 	force2 = getMomentumOfBall(ball2);
+// 	ball1.vX = force1.fX + force2.fX;
+// 	ball1.vY = force1.fY + force2.fY;
+// 	ball2.vX = force1.fX + force2.fX;
+// 	ball2.vY = force1.fY + force2.fY;
+// }
+
+// function foo(w1, v1, w2, v2) {
+//   totalM = w1 + w2;
+//   newV1 = (w1 - w2) * v1 /totalM + (2 * w2 * v2) / totalM;
+//   newV2 = (w2 - w1) * v2 /totalM + (2 * w1 * v1) / totalM;
+//   return [newV1, newV2]
+// }
+
 function updateVelocityAfterCollision(ball1, ball2) {
-	force1 = getMomentumOfBall(ball1);
-	force2 = getMomentumOfBall(ball2);
-	ball1.vX = force1.fX + force2.fX;
-	ball1.vY = force1.fY + force2.fY;
-	ball2.vX = force1.fX + force2.fX;
-	ball2.vY = force1.fY + force2.fY;
+  totalM = ball1.m + ball2.m;
+  ball1.vX = (ball1.m - ball2.m) * ball1.vX /totalM + (2 * ball2.m * ball2.vX) / totalM;
+  ball1.vY = (ball1.m - ball2.m) * ball1.vY /totalM + (2 * ball2.m * ball2.vY) / totalM;
+
+  ball2.vX = (ball2.m - ball1.m) * ball2.vX /totalM + (2 * ball1.m * ball1.vX) / totalM;
+  ball2.vY = (ball2.m - ball1.m) * ball2.vY /totalM + (2 * ball1.m * ball1.vY) / totalM;
 }
+
 
 function wallCollision() {
 	if (ball.y + ball.radius > canvas.height) {
@@ -686,9 +715,12 @@ function earlyCollisionEvents(balls) {
   do {
     event = queue.dequeue()
     earliestEvents.push(event)
-  } while (earlyTime === queue.peek().time)
+  } while (isSameTime(queue.peek().time, earlyTime))
 
-	return [earliestEvents, queue.peek().time]
+  nextEarliestTime = queue.peek().time;
+  queue.clear();
+
+	return [earliestEvents, nextEarliestTime];
 }
 
 function makeRandBalls(numberOfBalls) {
@@ -702,7 +734,7 @@ function makeRandBalls(numberOfBalls) {
 
 const oneTick = 90;
 async function loop(seconds) {
-	balls = makeRandBalls(20);
+	balls = makeRandBalls(5);
 //	paintBalls(balls)
 	// repeats here
 	durationMs = 1000 * seconds;
@@ -712,12 +744,7 @@ async function loop(seconds) {
 		await sleep(oneTick); //
 		durationMs = durationMs - oneTick;
 	}
-
-	// this loop was going too fast so sleep function was needed
 }
-//	var interval = setInterval(draw, 0);
-
-
 
 function reset() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
