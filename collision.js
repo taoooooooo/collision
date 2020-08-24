@@ -506,14 +506,12 @@ function timeToCollide(ball1, ball2) {
 	t1 = (-b + sqrtPart) / (2 * a);
 	t2 = (-b - sqrtPart) / (2 * a);
 
-	if (t1 > 0 && t2 > 0) {
-		return Math.min(t1, t2);
-	} else if (t1 * t2 === 0) {
+	if ((isSameTime(t1, 0)) || (isSameTime(t2, 0))) {
 		return 0;
-	} else if (t1 * t2 < 0) {
-		return Math.max(t1, t2);
+	} else if (t1 > 0 && t2 > 0) {
+		return Math.min(t1, t2);
 	} else {
-		return Number.MAX_VALUE;
+		return Math.min(Math.abs(t1), Math.abs(t2));
 	}
 }
 
@@ -550,7 +548,7 @@ function moveBalls(balls) {
   [events, nextEarliestTime] = earlyCollisionEvents(balls)
   eventTime = events[0].time
 
-  if (isSameTime(eventTime, errorOfMargin)) {
+  if (isSameTime(eventTime, 0)) {
     changeForcesOfCollidingBalls(events);
   }
   moveTime = isSameTime(eventTime, 0)
