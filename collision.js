@@ -565,13 +565,15 @@ function randomInt(n) {
 	return Math.floor(Math.random() * n);
 }
 
-function makeRandBall(max_x_or_y, max_x_or_y, max_radius, max_vX_or_vY, max_vX_or_vY, n) {
+function makeRandBall(max_x, max_y, max_radius, max_v, n) {
 	// return makeBall(randomInt(max_x_or_y) + 5, randomInt(max_x_or_y) + 5,
 	// 								randomInt(max_radius) + 5,
 	// 								selectDirection(randomInt(max_vX_or_vY)),
 	// 								selectDirection(randomInt(max_vX_or_vY)));
-  return makeBall(randomInt(max_x_or_y) + 5, randomInt(max_x_or_y) + 5,
-                  20,
+  let radius = randomInt(max_radius) + max_radius
+  let x = randomInt(max_x - radius * 2) + radius
+  let y = randomInt(max_y - radius * 2) + radius
+  return makeBall(x, y, radius,
                   selectDirection(randomInt(10)),
                   selectDirection(randomInt(10))
                   , n);
@@ -701,7 +703,7 @@ function areBallsOverlapped(ball1, ball2) {
 }
 
 function createNonOverlappingBall(existingBalls, n) {
-    newBall = makeRandBall(900, 600, 50, 50, 50, n);
+    newBall = makeRandBall(900, 600, 10, 50, n);
     for (var ball of existingBalls) {
         if (areBallsOverlapped(ball, newBall)) {
             return createNonOverlappingBall(existingBalls, n);
