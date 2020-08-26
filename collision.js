@@ -1,28 +1,251 @@
+/* Constants */
 
+// Walls
 const WALL_MAX_X = 900;
 const WALL_MAX_Y = 600;
 
+// time
 const TIME_UNIT = 1; // 1 second
+const ONE_TICK = 500;
 
-const canvas = document.getElementById('canvas');
+// canvas, colours, UI, etc
+const CANVAS = document.getElementById('canvas');
 
-const context = canvas.getContext('2d');
+const CONTEXT = CANVAS.getContext('2d');
 
-const colours = ['White', 'Silver', 'Gray', 'Black', 'Red', 'Maroon',
+const COLOURS = ['White', 'Silver', 'Gray', 'Black', 'Red', 'Maroon',
 'Yellow', 'Olive', 'Lime', 'Green', 'Aqua', 'Teal', 'Blue', 'Navy',
 'Fuchsia', 'Purple'];
 
+CANVAS.height = WALL_MAX_Y;
+CANVAS.width = WALL_MAX_X;
 
-canvas.height = WALL_MAX_Y;
-canvas.width = WALL_MAX_X;
+const ERROR_OF_MARGIN = 0.00000000001;
 
+/* Functions */
+
+// utility function
+function sleep(ms) { // ms is milleseconds
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+
+function isSameTime(time1, time2) {
+  return Math.abs((time1 - time2)) < ERROR_OF_MARGIN
+}
+
+function randomInt(n) {
+	//returns 0<= random integer < n
+	return Math.floor(Math.random() * n);
+}
+
+// UI Functions
+function clearCanvas() {
+	CONTEXT.clearRect(0, 0, WALL_MAX_X, WALL_MAX_Y);
+}
+
+function paintBall(ball) {
+	CONTEXT.beginPath();
+	CONTEXT.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI);
+	CONTEXT.fillStyle = ball.colour;
+	CONTEXT.fill();
+  CONTEXT.font = '50px serif';
+  CONTEXT.fillStyle = 'pink';
+  CONTEXT.fillText(String(ball.n), ball.x, ball.y)
+}
+////////////////////////////////////////////
+function calcDistSquareCoeff(l1, l2, lX1, lX2) {
+	// use pythagoras
+	locDiff = l1 - l2;
+	velDiff = lX1 - lX2;
+	return [Math.pow(locDiff, 2), //constant
+				2 * locDiff * velDiff, 		// t^1
+				Math.pow(velDiff, 2)];	//t^2
+}
+////////////////////////////////////////
 function makeBall(posX, posY, radius, velocityX, velocityY, n) {
 	return {n: n,
           x: posX, y: posY, radius: radius,
 					vX: velocityX, vY: velocityY, m: (radius/50),
-					colour: colours[randomInt(colours.length)]
+					colour: COLOURS[randomInt(COLOURS.length)]
 				};
 }
+
+function selectDirection(velocity) {
+	probability = Math.random();
+	if (0 <= probability && probability < 0.5) {
+		return velocity;
+	} else {
+			return -velocity;
+		}
+}
+
+function timeToCollide(ball1, ball2) {
+	coeffX = calcDistSquareCoeff(ball1.x, ball2.x, ball1.vX, ball2.vX);
+	coeffY = calcDistSquareCoeff(ball1.y, ball2.y, ball1.vY, ball2.vY);
+
+	//quadratics
+	c = coeffX[0] + coeffY[0] - Math.pow((ball1.radius + ball2.radius), 2);
+	b = coeffX[1] + coeffY[1];
+	a = coeffX[2] + coeffY[2];
+
+	//console.log("****" + a + ':' + b + ':' + c)
+  discriminant = Math.pow(b, 2) - 4 * a * c
+  if (discriminant < 0) {
+    //imaginary "roots"
+    return  Number.MAX_VALUE;
+  }
+	sqrtPart = Math.sqrt(discriminant);
+	t1 = (-b + sqrtPart) / (2 * a);
+	t2 = (-b - sqrtPart) / (2 * a);
+
+	if ((isSameTime(t1, 0)) || (isSameTime(t2, 0))) {
+		return 0;
+	} else if (t1 > 0 && t2 > 0) {
+		return Math.min(t1, t2);
+	} else {
+		return Math.min(Math.abs(t1), Math.abs(t2));
+	}
+}
+
+function velocitiesAfterCollision(m1, v1, m2, v2) {
+  totalM = m1 + m2
+
+  finalV1 = v1 * (m1 - m2) / totalM + (v2 * 2 * m2)/totalM;
+  finalV2 = (v1* 2 * m1) / totalM + v2 * (m2 - m1)/totalM;
+
+  return [finalV1, finalV2]
+}
+////////////////////////////////////////
+function makeRandBall(max_x, max_y, max_radius, max_v, n) {
+  let radius = randomInt(max_radius) + max_radius
+  let x = randomInt(max_x - radius * 2) + radius
+  let y = randomInt(max_y - radius * 2) + radius
+  return makeBall(x, y, radius,
+                  selectDirection(randomInt(10)),
+                  selectDirection(randomInt(10))
+                  , n);
+}
+
+function areBallsOverlapped(ball1, ball2) {
+ d = Math.sqrt(Math.pow((ball2.x - ball1.x), 2) +
+							 Math.pow((ball2.y - ball1.y), 2));
+ return (d < ball1.radius + ball2.radius);
+}
+
+function makeCollisionEvent(ball1, ball2) {
+	return {time: timeToCollide(ball1, ball2), ball1: ball1, ball2: ball2}
+}
+
+function updateVelocityAfterCollision(ball1, ball2) {
+  //totalM = ball1.m + ball2.m;
+  [vX1, vX2] = velocitiesAfterCollision(ball1.m, ball1.vX, ball2.m, ball2.vX);
+  [vY1, vY2] = velocitiesAfterCollision(ball1.m, ball1.vY, ball2.m, ball2.vY);
+
+  ball1.vX = vX1;
+  ball1.vY = vY1;
+  ball2.vX = vX2;
+  ball2.vY = vY2;
+  }
+
+////////////////////////////////////////////
+
+function createNonOverlappingBall(existingBalls, n) {
+    newBall = makeRandBall(900, 600, 10, 50, n);
+    for (var ball of existingBalls) {
+        if (areBallsOverlapped(ball, newBall)) {
+            return createNonOverlappingBall(existingBalls, n);
+        }
+    }
+    return newBall;
+}
+
+function earlyCollisionEvents(balls) {
+  // return array of events, which will occur the earliest time
+  var queue = new PriorityQueue({ comparator: function(event1, event2) {
+    return event1.time - event2.time;
+  }})
+
+  	// build queue
+  	for (var i = 0; i < balls.length - 1; i++) {
+  		for	(var j = i + 1; j < balls.length; j++) {
+  				event = makeCollisionEvent(balls[i], balls[j]);
+  				queue.queue(event);
+  		}
+  	}
+    earlyTime = queue.peek().time;
+  	earliestEvents = [];
+    do {
+      event = queue.dequeue()
+      earliestEvents.push(event)
+    } while (queue.length > 0 && queue.peek().time === earlyTime)
+
+    nextEarliestTime = (queue.lengh > 0) ? queue.peek().time: Number.MAX_VALUE;
+
+  	return [earliestEvents, nextEarliestTime];
+  }
+
+function changeForcesOfCollidingBalls(events) {
+  for (const event of events) {
+    updateVelocityAfterCollision(event.ball1, event.ball2);
+  }
+}
+
+function moveBall(ball, time) {
+    ball.x = ball.x + time * ball.vX;			// next x ball coordinate =
+  	ball.y = ball.y + time * ball.vY;
+}
+///////////////////////////////////////////
+function makeRandBalls(numberOfBalls) {
+        //function will create an array of balls
+        ballArray = new Array(numberOfBalls);
+        for (i = 0; i < ballArray.length; i = i + 1) {
+            ballArray[i] = createNonOverlappingBall(ballArray.slice(0, i), i);
+        }
+        return ballArray;
+}
+
+function paintBalls(balls) {
+	clearCanvas();
+	for (var ball of balls) {
+		paintBall(ball);
+	}
+}
+
+function moveBalls(balls) {
+  [events, nextEarliestTime] = earlyCollisionEvents(balls)
+  eventTime = events[0].time
+
+  if (isSameTime(eventTime, 0)) {
+    changeForcesOfCollidingBalls(events);
+  }
+  moveTime = isSameTime(eventTime, 0)
+  ? Math.min(nextEarliestTime, 1)
+  : Math.min(eventTime, 1);
+
+	for (var ball of balls) {
+		 moveBall(ball, moveTime)
+   }
+}
+
+async function loop(seconds) {
+	balls = makeRandBalls(10);
+	// repeats here
+	durationMs = 1000 * seconds;
+	while (0 < durationMs) {
+		paintBalls(balls);
+		moveBalls(balls);
+		await sleep(ONE_TICK); //
+		durationMs = durationMs - ONE_TICK;
+	}
+}
+
+function reset() {
+	CONTEXT.clearRect(0, 0, CANVAS.width, CANVAS.height);
+}
+/************************************************************************/
+
 
 function getMovingDirection(v) {
   if (v === 0) {
@@ -47,27 +270,6 @@ function distanceToWall(x_or_y, vx_or_vy, max_x_or_y) {
    }
 }
 
-// Simulate elements at 30 fps == 1/30 sec for each frame rendering
-// Therefore, we only need to compute all events within next 1/30 seconds.
-// calculate distance between 0 to 1/30 of a second to see if the balls collide
-// 1. get two line equations
-// 2. check if they cross (i.e., not parallel)
-// 3. compute time of when they cross
-// 4. if the time is between t0 <= cross-time <= t1(= t0 + 1/30 sec), then it means collision.
-
-// // TESTS
-// console.log(distanceToWall(10, 10, 600))
-
-
-/* test balls
-b1 = makeBall(1,2,3,4,5) // hit right wall
-b2 = makeBall(4,6, 7, -10, 10) // hit left wall
-b3 = makeBall(34, 100, 122, 0,333) // hit no vertical wall
-Number.MAX_VALUE === distanceToWall(b3)
-
-distance
-*/
-
 function timeToHitWall(x_or_y, vx_or_vy, max_x_or_y) {
   distance = distanceToWall(x_or_y, vx_or_vy, max_x_or_y);
   // console.log("1 " + distance)
@@ -83,295 +285,4 @@ function timeToHitVerticalWall(ball) {
 
 function timeToHitHorizontalWall(ball) {
   return timeToHitWall(ball.y, ball.vY, WALL_MAX_Y);
-}
-
-function calcDistSquareCoeff(l1, l2, lX1, lX2) {
-	// use pythagoras
-	locDiff = l1 - l2;
-	velDiff = lX1 - lX2;
-	return [Math.pow(locDiff, 2), //constant
-				2 * locDiff * velDiff, 		// t^1
-				Math.pow(velDiff, 2)];	//t^2
-}
-
-function timeToCollide(ball1, ball2) {
-	coeffX = calcDistSquareCoeff(ball1.x, ball2.x, ball1.vX, ball2.vX);
-	coeffY = calcDistSquareCoeff(ball1.y, ball2.y, ball1.vY, ball2.vY);
-
-	//quadratics
-	c = coeffX[0] + coeffY[0] - Math.pow((ball1.radius + ball2.radius), 2);
-	b = coeffX[1] + coeffY[1];
-	a = coeffX[2] + coeffY[2];
-
-	//console.log("****" + a + ':' + b + ':' + c)
-  discriminant = Math.pow(b, 2) - 4 * a * c
-  if (discriminant < 0) {
-    //imaginary "roots"
-    return  Number.MAX_VALUE;
-  }
-	sqrtPart = Math.sqrt(discriminant);
-// you need to add brackets between 2a for some reason
-	t1 = (-b + sqrtPart) / (2 * a);
-	t2 = (-b - sqrtPart) / (2 * a);
-
-	if ((isSameTime(t1, 0)) || (isSameTime(t2, 0))) {
-		return 0;
-	} else if (t1 > 0 && t2 > 0) {
-		return Math.min(t1, t2);
-	} else {
-		return Math.min(Math.abs(t1), Math.abs(t2));
-	}
-}
-
-/*
- b1 = makeBall(0, 0, 1, 1, 1); // hit right wall
- b2 = makeBall(4, 4, 1, -1, -1); // hit left wall
- b3 = makeBall(4, 0, 1, -1, 1);
- b4 = makeBall(0, 4, 1, 1, -1);
- b5 = makeBall(2, 4, 1, 0, -1);
-*/
- // console.log("1 2", timeToCollide(b1,b2))
- // console.log("1 3", timeToCollide(b1,b3))
- // console.log("1 4", timeToCollide(b1,b4))
- // console.log("1 5", timeToCollide(b1,b5))
- // console.log("1 2", calcDistSquareCoeff(0, 4, 1, -1))
- // console.log("1 3", calcDistSquareCoeff(0, 0, 1, 1))
- // console.log("1 4", calcDistSquareCoeff(0, 4, 1, -1))
- // console.log("1 5", calcDistSquareCoeff(0, 2, 1, 0))
-
-
-
-function moveBall(ball, time) {
-    ball.x = ball.x + time * ball.vX;			// next x ball coordinate =
-  	ball.y = ball.y + time * ball.vY;
-}
-
-const errorOfMargin = 0.00000000001;
-
-function isSameTime(time1, time2) {
-  return Math.abs((time1 - time2)) < errorOfMargin
-}
-
-function moveBalls(balls) {
-  [events, nextEarliestTime] = earlyCollisionEvents(balls)
-  eventTime = events[0].time
-
-  if (isSameTime(eventTime, 0)) {
-    changeForcesOfCollidingBalls(events);
-  }
-  moveTime = isSameTime(eventTime, 0)
-  ? Math.min(nextEarliestTime, 1)
-  : Math.min(eventTime, 1);
-
-	for (var ball of balls) {
-		 moveBall(ball, moveTime)
-   }
-}
-
-function randomInt(n) {
-	//returns 0<= random integer < n
-	return Math.floor(Math.random() * n);
-}
-
-function makeRandBall(max_x, max_y, max_radius, max_v, n) {
-	// return makeBall(randomInt(max_x_or_y) + 5, randomInt(max_x_or_y) + 5,
-	// 								randomInt(max_radius) + 5,
-	// 								selectDirection(randomInt(max_vX_or_vY)),
-	// 								selectDirection(randomInt(max_vX_or_vY)));
-  let radius = randomInt(max_radius) + max_radius
-  let x = randomInt(max_x - radius * 2) + radius
-  let y = randomInt(max_y - radius * 2) + radius
-  return makeBall(x, y, radius,
-                  selectDirection(randomInt(10)),
-                  selectDirection(randomInt(10))
-                  , n);
-}
-// if it is =< instead of <=, it will be invalid left hand assigment, syntax error
-function selectDirection(velocity) {
-	probability = Math.random();
-	if (0 <= probability && probability < 0.5) {
-		return velocity;
-	} else {
-			return -velocity;
-		}
-}
-
-/*
-function makeRandBall(max_x_or_y, max_x_or_y, max_radius, max_vX_or_vY, max_vX_or_vY) {
-	return makeBall(randomInt(max_x_or_y) + 5, randomInt(max_x_or_y) + 5,
-									randomInt(max_radius) + 5,
-									randomInt(max_vX_or_vY) + 5, randomInt(max_vX_or_vY) + 5,
-									)
-} this one is faulty because it only selects velocity in a positive direction
-so every ball goes in the same direction
-*/
-// function makeRandBalls(numberOfBalls) {
-// 	//function will create an array of balls
-// 	ballArray = new Array(numberOfBalls)
-// 	for (i = 0; i < ballArray.length; i = i + 1) {
-// 			// each ball has random x and y, vx and vy, radius and mass
-// 			ballArray[i] = makeRandBall(600, 600, 50, 50, 50, 10)
-// 	}
-// 	return ballArray
-// }
-
-function paintBall(ball) {
-	context.beginPath();
-	context.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI);
-	context.fillStyle = ball.colour;
-	context.fill();
-  context.font = '50px serif';
-  context.fillStyle = 'pink';
-  context.fillText(String(ball.n), ball.x, ball.y)
-}
-
-function paintBalls(balls) {
-	clearCanvas();
-	for (var ball of balls) {
-		paintBall(ball);
-	}
-}
-
-function getMomentumOfBall(ball) {
-	return {fX: ball.m * ball.vX, fY: ball.m * ball.vY};
-}
-
-// function updateVelocityAfterCollision(ball1, ball2) {
-// 	force1 = getMomentumOfBall(ball1);
-// 	force2 = getMomentumOfBall(ball2);
-// 	ball1.vX = force1.fX + force2.fX;
-// 	ball1.vY = force1.fY + force2.fY;
-// 	ball2.vX = force1.fX + force2.fX;
-// 	ball2.vY = force1.fY + force2.fY;
-// }
-
-// function foo(w1, v1, w2, v2) {
-//   totalM = w1 + w2;
-//   newV1 = (w1 - w2) * v1 /totalM + (2 * w2 * v2) / totalM;
-//   newV2 = (w2 - w1) * v2 /totalM + (2 * w1 * v1) / totalM;
-//   return [newV1, newV2]
-// }
-
-function velocitiesAfterCollision(m1, v1, m2, v2) {
-  totalM = m1 + m2
-
-  finalV1 = v1 * (m1 - m2) / totalM + (v2 * 2 * m2)/totalM;
-  finalV2 = (v1* 2 * m1) / totalM + v2 * (m2 - m1)/totalM;
-
-  return [finalV1, finalV2]
-}
-
-function updateVelocityAfterCollision(ball1, ball2) {
-  //totalM = ball1.m + ball2.m;
-  [vX1, vX2] = velocitiesAfterCollision(ball1.m, ball1.vX, ball2.m, ball2.vX);
-  [vY1, vY2] = velocitiesAfterCollision(ball1.m, ball1.vY, ball2.m, ball2.vY);
-
-  ball1.vX = vX1;
-  ball1.vY = vY1;
-  ball2.vX = vX2;
-  ball2.vY = vY2;
-  }
-
-
-function wallCollision() {
-	if (ball.y + ball.radius > canvas.height) {
-			ball.vY = ball.vY * -1;
-			}
-	if (ball.y + ball.radius < 0) {
-			ball.vY = ball.vY * -1;
-			}
-	if (ball.x + ball.radius > canvas.width) {
-			ball.vX = ball.vX * -1;
-			}
-	if (ball.x + ball.radius < 0) {
-			ball.vX = ball.vX * -1;
-			}
-}
-
-function clearCanvas() {
-	context.clearRect(0, 0, WALL_MAX_X, WALL_MAX_Y);
-}
-// ms is milleseconds
-function sleep(ms) {
-	return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-//pairCollision = timeToCollide(ball1, ball2)
-
-function changeForcesOfCollidingBalls(events) {
-  for (const event of events) {
-    updateVelocityAfterCollision(event.ball1, event.ball2);
-  }
-}
-
-function areBallsOverlapped(ball1, ball2) {
- d = Math.sqrt(Math.pow((ball2.x - ball1.x), 2) +
-							 Math.pow((ball2.y - ball1.y), 2));
- return (d < ball1.radius + ball2.radius);
-}
-
-function createNonOverlappingBall(existingBalls, n) {
-    newBall = makeRandBall(900, 600, 10, 50, n);
-    for (var ball of existingBalls) {
-        if (areBallsOverlapped(ball, newBall)) {
-            return createNonOverlappingBall(existingBalls, n);
-        }
-    }
-    return newBall;
-}
-
-function makeCollisionEvent(ball1, ball2) {
-	return {time: timeToCollide(ball1, ball2), ball1: ball1, ball2: ball2}
-}
-
-function earlyCollisionEvents(balls) {
-  // return array of events, which will occur the earliest time
-  var queue = new PriorityQueue({ comparator: function(event1, event2) {
-    return event1.time - event2.time;
-  }})
-
-	// build queue
-	for (var i = 0; i < balls.length - 1; i++) {
-		for	(var j = i + 1; j < balls.length; j++) {
-				event = makeCollisionEvent(balls[i], balls[j]);
-				queue.queue(event);
-		}
-	}
-  earlyTime = queue.peek().time;
-	earliestEvents = [];
-  do {
-    event = queue.dequeue()
-    earliestEvents.push(event)
-  } while (queue.length > 0 && queue.peek().time === earlyTime)
-
-  nextEarliestTime = (queue.lengh > 0) ? queue.peek().time: Number.MAX_VALUE;
-
-	return [earliestEvents, nextEarliestTime];
-}
-
-function makeRandBalls(numberOfBalls) {
-        //function will create an array of balls
-        ballArray = new Array(numberOfBalls);
-        for (i = 0; i < ballArray.length; i = i + 1) {
-            ballArray[i] = createNonOverlappingBall(ballArray.slice(0, i), i);
-        }
-        return ballArray;
-}
-
-const oneTick = 500;
-async function loop(seconds) {
-	balls = makeRandBalls(10);
-//	paintBalls(balls)
-	// repeats here
-	durationMs = 1000 * seconds;
-	while (0 < durationMs) {
-		paintBalls(balls);
-		moveBalls(balls);
-		await sleep(oneTick); //
-		durationMs = durationMs - oneTick;
-	}
-}
-
-function reset() {
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
