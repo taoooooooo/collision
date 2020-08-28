@@ -278,20 +278,6 @@ function moveBalls(balls) {
    }
 }
 
-// function whenWallCollisionOccurs(ball) {
-// 	for (var i = 0; ball.length; i++) {
-// 		if (ball.x + ball.radius === 0) {
-// 			ball.vX = -1 * ball.vX;
-// 		} else if (ball.y + ball.radius === 0) {
-// 			ball.vY = -1 * ball.vY;
-// 		} else if (ball.x + ball.radius === WALL_MAX_X) {
-// 			ball.vX = -1 * ball.vX;
-// 		} else if (ball.y + ball.radius === WALL_MAX_Y) {
-// 			ball.vY = -1 * ball.vY;
-// 		}
-// 	}
-// }
-
 async function loop(seconds) {
 	var balls = makeRandBalls(10);
 	// repeats here
