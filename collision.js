@@ -31,8 +31,8 @@ function sleep(ms) { // ms is milleseconds
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function isSameTime(time1, time2) {
-  return Math.abs((time1 - time2)) < ERROR_OF_MARGIN
+function isAlmostSameNumber(number1, number2) {
+  return Math.abs((number1 - number2)) < ERROR_OF_MARGIN
 }
 
 function randomInt(n) {
@@ -100,7 +100,7 @@ const	sqrtPart = Math.sqrt(discriminant);
 const	t1 = (-b + sqrtPart) / (2 * a);
 const	t2 = (-b - sqrtPart) / (2 * a);
 
-	if ((isSameTime(t1, 0)) || (isSameTime(t2, 0))) {
+	if ((isAlmostSameNumber(t1, 0)) || (isAlmostSameNumber(t2, 0))) {
 		return 0;
 	} else if (t1 > 0 && t2 > 0) {
 		return Math.min(t1, t2);
@@ -159,7 +159,7 @@ function isHorizontalWall(wall) {
 function updateVelocityOfBallAfterCollision(ball, wall) {
 	if (isVerticalWall(wall)) {
 	  ball.vX = -ball.vX;
-} else if (isHorizontalWall(wall)); {
+} else {
 		ball.vY = -ball.vY;
 	}
 }
@@ -177,16 +177,28 @@ const newBall = makeRandBall(900, 600, 10, 50, n);
 
 function makeVerticalWallCollisionEvent(ball) {
 	const wall = (ball.vX > 0) ? RIGHT_WALL : LEFT_WALL;
-	const c = (wall === RIGHT_WALL) ? WALL_MAX_X : 0;
-	const time = (c - ball.x - ball.radius)/ball.vX
-	return {time: time, ball: ball, wall: wall}
+	if (isAlmostSameNumber(ball.vX, 0)) {
+		return {time: Number.MAX_VALUE, ball: ball, wall: wall}
+	} else if (wall === RIGHT_WALL) {
+		const time = (WALL_MAX_X - ball.x - ball.radius)/ball.vX
+		return {time: time, ball: ball, wall: wall}
+	} else { // LEFT_WALL
+		const time = (- ball.x + ball.radius)/ball.vX
+		return {time: time, ball: ball, wall: wall}
+	}
 }
 
 function makeHorizontalWallCollisionEvent(ball) {
 	const wall = (ball.vY > 0) ? BOTTOM_WALL : TOP_WALL;
-	const c = (wall === BOTTOM_WALL) ? WALL_MAX_Y : 0;
-	const time = (c - ball.y - ball.radius)/ball.vY
-	return {time: time, ball: ball, wall: wall}
+	if (isAlmostSameNumber(ball.vY, 0)) {
+		return {time: Number.MAX_VALUE, ball: ball, wall: wall}
+	} else if (wall === BOTTOM_WALL)  {
+		const time = (WALL_MAX_Y - ball.y - ball.radius)/ball.vY
+		return {time: time, ball: ball, wall: wall}
+	} else { // TOP_WALL
+		const time = (- ball.y + ball.radius)/ball.vY
+		return {time: time, ball: ball, wall: wall}
+	}
 }
 
 function earlyCollisionEvents(balls) {
@@ -195,12 +207,12 @@ function earlyCollisionEvents(balls) {
     return event1.time - event2.time;
   }});
 
-		// for (let i = 0; i < balls.length; i++) {
-		// 		const event1 = makeVerticalWallCollisionEvent(balls[i]);
-		// 		const event2 = makeHorizontalWallCollisionEvent(balls[i]);
-		// 		queue.queue(event1);
-		// 		queue.queue(event2);
-		// 	}
+	for (let i = 0; i < balls.length; i++) {
+			const event1 = makeVerticalWallCollisionEvent(balls[i]);
+			const event2 = makeHorizontalWallCollisionEvent(balls[i]);
+			queue.queue(event1);
+			queue.queue(event2);
+	}
 
   	// build queue ball vs ball collision
   	for (let i = 0; i < balls.length - 1; i++) {
@@ -266,10 +278,10 @@ function moveBalls(balls) {
   const [events, nextEarliestTime] = earlyCollisionEvents(balls)
   const eventTime = events[0].time
 
-  if (isSameTime(eventTime, 0)) {
+  if (isAlmostSameNumber(eventTime, 0)) {
     changeForcesOfCollidingBalls(events);
   }
-  const moveTime = isSameTime(eventTime, 0)
+  const moveTime = isAlmostSameNumber(eventTime, 0)
   ? Math.min(nextEarliestTime, 1)
   : Math.min(eventTime, 1);
 
