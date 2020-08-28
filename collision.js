@@ -195,12 +195,12 @@ function earlyCollisionEvents(balls) {
     return event1.time - event2.time;
   }});
 
-		for (let i = 0; i < balls.length; i++) {
-				const event1 = makeVerticalWallCollisionEvent(balls[i]);
-				const event2 = makeHorizontalWallCollisionEvent(balls[i]);
-				queue.queue(event1);
-				queue.queue(event2);
-			}
+		// for (let i = 0; i < balls.length; i++) {
+		// 		const event1 = makeVerticalWallCollisionEvent(balls[i]);
+		// 		const event2 = makeHorizontalWallCollisionEvent(balls[i]);
+		// 		queue.queue(event1);
+		// 		queue.queue(event2);
+		// 	}
 
   	// build queue ball vs ball collision
   	for (let i = 0; i < balls.length - 1; i++) {
@@ -235,7 +235,7 @@ function changeForcesOfCollidingBalls(events) {
 	for (const event of events) {
 		if (isBallVsBall(event)) {
 			updateVelocityAfterCollision(event.ball1, event.ball2);
-		}	else if isBallVsWall(event) {
+		}	else if (isBallVsWall(event)) {
 				updateVelocityOfBallAfterCollision(event.ball, event.wall);
 		}
 	 }
