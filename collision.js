@@ -8,7 +8,7 @@ const BOTTOM_WALL = 2;
 const LEFT_WALL = 3;
 // time
 const TIME_UNIT = 1; // 1 second
-const ONE_TICK = 500;
+const ONE_TICK = 50;
 
 // canvas, colours, UI, etc
 const CANVAS = document.getElementById('canvas');
@@ -279,7 +279,9 @@ function moveBalls(balls) {
 }
 
 async function loop(seconds) {
-	var balls = makeRandBalls(10);
+	const button = document.getElementById("startButton");
+	button.disabled = true;
+	const balls = makeRandBalls(10);
 	// repeats here
 	let durationMs = 1000 * seconds;
 	while (0 < durationMs) {
@@ -288,6 +290,7 @@ async function loop(seconds) {
 		await sleep(ONE_TICK); //
 		durationMs = durationMs - ONE_TICK;
 	}
+	button.disabled = false;
 }
 
 function reset() {
