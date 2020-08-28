@@ -2,7 +2,10 @@
 // Walls
 const WALL_MAX_X = 900;
 const WALL_MAX_Y = 600;
-
+const TOP_WALL = 0
+const RIGHT_WALL = 1
+const BOTTOM_WALL = 2
+const LEFT_WALL = 3
 // time
 const TIME_UNIT = 1; // 1 second
 const ONE_TICK = 500;
@@ -27,8 +30,6 @@ const ERROR_OF_MARGIN = 0.00000000001;
 function sleep(ms) { // ms is milleseconds
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
-
-
 
 function isSameTime(time1, time2) {
   return Math.abs((time1 - time2)) < ERROR_OF_MARGIN
@@ -113,8 +114,7 @@ const totalM = m1 + m2
 
 const finalV1 = v1 * (m1 - m2) / totalM + (v2 * 2 * m2)/totalM;
 const finalV2 = (v1* 2 * m1) / totalM + v2 * (m2 - m1)/totalM;
-
-  return [finalV1, finalV2]
+	return [finalV1, finalV2]
 }
 ////////////////////////////////////////
 function makeRandBall(max_x, max_y, max_radius, max_v, n) {
@@ -148,6 +148,21 @@ const [vY1, vY2] = velocitiesAfterCollision(ball1.m, ball1.vY, ball2.m, ball2.vY
   ball2.vY = vY2;
   }
 
+function isVerticalWall(wall) {
+	return (wall === LEFT_WALL || wall === RIGHT_WALL);
+}
+
+function isHorizontalWall(wall) {
+	return (wall === TOP_WALL || wall === BOTTOM_WALL);
+}
+
+function updateVelocityOfBallAfterCollision(ball, wall) {
+	if (isVerticalWall(wall));
+	  ball.vX = -ball.vX
+} else if (isHorizontalWall(wall)); {
+		ball.vY = -ball.vY
+}
+
 ////////////////////////////////////////////
 
 function createNonOverlappingBall(existingBalls, n) {
@@ -165,8 +180,16 @@ function earlyCollisionEvents(balls) {
   let queue = new PriorityQueue({ comparator: function(event1, event2) {
     return event1.time - event2.time;
   }})
+		// TO do
+		// ball vs wall collision
+		// for loop let i
+		for (let i = balls[]; i < balls.length - 1; i++) {
+				const event1 = makeVerticalWallCollision(ball);
+				const event2 = makeHorizontalWallCollision(ball);
+			}
 
-  	// build queue
+
+  	// build queue ball vs ball collision
   	for (let i = 0; i < balls.length - 1; i++) {
   		for	(let j = i + 1; j < balls.length; j++) {
   			const	event = makeCollisionEvent(balls[i], balls[j]);
@@ -185,10 +208,24 @@ function earlyCollisionEvents(balls) {
   	return [earliestEvents, nextEarliestTime];
   }
 
+function isBallVsWall(event) {
+	return Boolean(event.wall)
+}
+
+function isBallVsBall(event) {
+	return Boolean(event.ball1 && event.ball2)
+}
+
 function changeForcesOfCollidingBalls(events) {
-  for (const event of events) {
-    updateVelocityAfterCollision(event.ball1, event.ball2);
-  }
+	// has to check what kind of event it is, whether it be ball vs ball or wall vs ball
+	// if statement
+	for (const event of events) {
+		if (isBallVsBall(event)) {
+			updateVelocityAfterCollision(event.ball1, event.ball2);
+		}	else if isBallVsWall(event) {
+				updateVelocityOfBallAfterCollision(event.ball, event.wall);
+		}
+	}
 }
 
 function moveBall(ball, time) {
@@ -228,8 +265,22 @@ function moveBalls(balls) {
    }
 }
 
+function wallCollision(ballsArray) {
+	for (var i = 0; balls.length; i++) {
+		if (ball.x + ball.radius === 0) {
+			ball.vX = -1 * ball.vX;
+		} else if (ball.y + ball.radius === 0) {
+			ball.vY = -1 * ball.vY;
+		} else if (ball.x + ball.radius === WALL_MAX_X) {
+			ball.vX = -1 * ball.vX;
+		} else if (ball.y + ball.radius === WALL_MAX_Y) {
+			ball.vY = -1 * ball.vY;
+	}
+}
+
 async function loop(seconds) {
 	const balls = makeRandBalls(10);
+	wallCollision(balls);
 	// repeats here
 	let durationMs = 1000 * seconds;
 	while (0 < durationMs) {
