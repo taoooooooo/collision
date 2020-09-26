@@ -1,7 +1,25 @@
-<!DOCTYPE html>
 <html>
+
+<head>
+	<title>Template</title>
+	<style>
+		html {
+			background-color: #DDFFDD;
+		}
+		#canvas {
+
+			border: solid #000000 4px;
+		}
+
+	</style>
+</head>
+
 <body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
-</body>
+	<canvas id="canvas">box</canvas>
+<script src="js-priority-queue/priority-queue.js"></script>
+<script src="collision.js"></script>
+<button type="button" onclick="clearCanvas()">Restart</button>
+<label for="duration">Simulation Duration(seconds):</label>
+<input type="text" id="duration" name="duration">
+<button type="button" id="startButton" onclick="loop(parseInt(document.getElementById('duration').value))">Start simulation</button>
 </html>
