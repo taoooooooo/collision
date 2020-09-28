@@ -2,10 +2,10 @@
 // Walls
 const WALL_MAX_X = 900;
 const WALL_MAX_Y = 600;
-const TOP_WALL = 0;
-const RIGHT_WALL = 1;
-const BOTTOM_WALL = 2;
-const LEFT_WALL = 3;
+const TOP_WALL = 1;
+const RIGHT_WALL = 2;
+const BOTTOM_WALL = 3;
+const LEFT_WALL = 4;
 // time
 const TIME_UNIT = 1; // 1 second
 const ONE_TICK = 50;
